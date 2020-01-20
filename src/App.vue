@@ -7,7 +7,7 @@
       <div style="-webkit-app-region: no-drag;" class="mr-n2">
         <v-icon @click="minimize()" v-ripple class="appbar-icon">mdi-minus</v-icon>
         <v-icon @click="maximized ? unmaximize() : maximize()" v-ripple class="appbar-icon">mdi-crop-square</v-icon>
-        <v-icon @click="close()" v-ripple class="appbar-icon">mdi-close</v-icon>
+        <v-icon @click="shutdown_confirm = true" v-ripple class="appbar-icon">mdi-close</v-icon>
       </div>
     </v-system-bar>
 
@@ -34,17 +34,33 @@
                   </v-card-text>
                 </v-card>
               </v-col>
+
               <v-col cols="12" sm="12">
-                <!-- <v-card class="fill-height">
-                  <textarea v-model="$root.script" class="fill-height"></textarea>
-                </v-card> -->
+                <v-list nav dense class="elevation-3 fill-height">
+                  <v-list-item-group mandatory v-model="tab">
+                    <v-list-item value="console">
+                      <v-list-item-icon><v-icon>mdi-console-line</v-icon></v-list-item-icon>
+                      <v-list-item-title>Console</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item value="explorer">
+                      <v-list-item-icon><v-icon>mdi-folder</v-icon></v-list-item-icon>
+                      <v-list-item-title>Explorer</v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item value="editor">
+                      <v-list-item-icon><v-icon>mdi-pencil</v-icon></v-list-item-icon>
+                      <v-list-item-title>Editor</v-list-item-title>
+                    </v-list-item>
+                  </v-list-item-group>
+                </v-list>
               </v-col>
             </v-row>
           </v-col>
 
           <v-col cols="12" sm="9" class="py-6 pr-6">
             <v-card class="fill-height" style="font-family: 'Roboto Mono'; height: calc( 100vh - 80px )">
-              <v-card-text>
+              <v-card-text v-if="tab === 'console'">
                 <div v-for="(item, index) in history" :key="index">
                   <p v-html="item"></p>
                 </div>
@@ -54,6 +70,22 @@
         </v-row>
       </v-container>
 		</v-content>
+
+    <v-dialog v-model="shutdown_confirm" max-width="350">
+      <v-card>
+        <v-card-title>
+          <span style="margin: auto;" class="red--text text--lighten-1 font-weight-bold text-uppercase">Confirm Shutdown</span>
+        </v-card-title>
+
+        <v-card-text style="text-align: center;">Closing the Relay Management Console will stop the server instance. Are you sure you want to continue?</v-card-text>
+
+        <v-card-actions>
+          <v-btn text color="green" @click="shutdown_confirm = false">Cancel</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn text color="red" @click="close()">Confirm</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -83,6 +115,8 @@ export default {
       maximized: remote.getCurrentWindow().isMaximized(),
       history: [],
       files: [],
+      shutdown_confirm: false,
+      tab: 'console'
       // auto_launch: new AutoLaunch({
       //   name: 'Relay Management Console',
       //   path: 'C:/Users/Aidan Liddy/Dev/paradigm/rmc/node_modules/electron/dist/electron.exe'

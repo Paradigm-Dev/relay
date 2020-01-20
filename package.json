@@ -1,9 +1,9 @@
 {
-  "name": "RMC",
+  "name": "Relay",
   "version": "1.0.0",
   "author": "Paradigm Development",
   "description": "Visual mananger for Relay",
-  "homepage": "https://www.theparadigmdev.com",
+  "homepage": "https://github.com/Paradigm-Dev/relay",
   "private": true,
   "scripts": {
     "build": "vue-cli-service electron:build",
