@@ -1,9 +1,0 @@
-directories:
-  output: output
-  buildResources: build
-  app: output/bundled
-files:
-  - filter:
-      - '**'
-extends: null
-electronVersion: 6.1.7
