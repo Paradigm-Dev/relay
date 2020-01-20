@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-system-bar app window style="-webkit-app-region: drag;" class="deep-purple elevation-4">
+    <v-system-bar v-if="process.platform == 'win32'" app window style="-webkit-app-region: drag;" class="deep-purple elevation-4">
       <img @click.left="reload()" src="./assets/logo.png" height="18" style="margin-right: 4px;">
       <span style="margin-right: 4px">Relay Management Conosle</span>
       <v-spacer></v-spacer>
@@ -9,6 +9,11 @@
         <v-icon @click="maximized ? unmaximize() : maximize()" v-ripple class="appbar-icon">mdi-crop-square</v-icon>
         <v-icon @click="shutdown_confirm = true" v-ripple class="appbar-icon">mdi-close</v-icon>
       </div>
+    </v-system-bar>
+
+    <v-system-bar v-if="process.platform == 'darwin'" app window style="-webkit-app-region: drag;" height="38" class="deep-purple elevation-4">
+      <img @click.left="reload()" src="./assets/logo.png" height="18" style="margin-left: 70px; margin-right: 4px;">
+      <span style="margin-right: 4px">Relay Management Conosle</span>
     </v-system-bar>
 
 		<v-content>
@@ -59,7 +64,7 @@
           </v-col>
 
           <v-col cols="12" sm="9" class="py-6 pr-6">
-            <v-card class="fill-height" style="font-family: 'Roboto Mono'; height: calc( 100vh - 80px )">
+            <v-card class="fill-height" style="font-family: 'Roboto Mono'; height: calc( 100vh - 90px )">
               <v-card-text v-if="tab === 'console'">
                 <div v-for="(item, index) in history" :key="index">
                   <p v-html="item"></p>
@@ -116,7 +121,8 @@ export default {
       history: [],
       files: [],
       shutdown_confirm: false,
-      tab: 'console'
+      tab: 'console',
+      process: process
       // auto_launch: new AutoLaunch({
       //   name: 'Relay Management Console',
       //   path: 'C:/Users/Aidan Liddy/Dev/paradigm/rmc/node_modules/electron/dist/electron.exe'
@@ -275,6 +281,7 @@ export default {
     }
   },
   created() {
+    console.log(process.platform)
     const userDataPath = (electron.app || electron.remote.app).getPath('userData')
     var pathway = path.join(userDataPath, 'relay.json')
 
