@@ -21,8 +21,6 @@ const app = express()
 const server = https.createServer({
   key: fs.readFileSync(__dirname + '/server.key'),
   cert: fs.readFileSync(__dirname + '/server.pem')
-  // key: fs.readFileSync('/etc/letsencrypt/live/www.theparadigmdev.com/privkey.pem'),
-  // cert: fs.readFileSync('/etc/letsencrypt/live/www.theparadigmdev.com/fullchain.pem')
 }, app).listen(port, host)
 console.log('\x1b[32m', '[ SERVER ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS A'), '\x1b[34m', `https://${host}:${port}`, '\x1b[0m', 'listening')
 
