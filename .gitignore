@@ -12,3 +12,4 @@ blacklist.txt
 suspicious.log
 server.key
 server.pem
+.DS_Store
