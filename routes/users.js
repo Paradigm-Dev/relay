@@ -5,6 +5,7 @@ const passport = require('passport')
 const _path = require('path')
 const formidable = require('formidable')
 const fs = require('fs')
+const moment = require('moment')
 
 const UserModel = require('../models/User.js')
 const ChatroomModel = require('../models/Chatroom.js')
@@ -25,6 +26,7 @@ router.post('/register', (req, res) => {
         color: req.body.color,
         rights: req.body.rights,
         moonrocks: req.body.moonrocks,
+        created: moment().format('dddd, MMMM Do YYYY [at] h:mm a')
       })
 
       fs.mkdirSync(__dirname + '/../drawer/' + newUser.username)

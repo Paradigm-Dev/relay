@@ -59,7 +59,8 @@ const UserSchema = new mongoose.Schema({
   files: [FileSchema],
   banned: Boolean,
   strikes: Number,
-  in: Boolean
+  in: Boolean,
+  created: String
 })
 
 const UserModel = mongoose.model('user', UserSchema)
