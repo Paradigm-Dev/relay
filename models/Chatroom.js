@@ -3,10 +3,12 @@ const mongoose = require('mongoose')
 const MessageSchema = new mongoose.Schema({
   color: String,
   username: String,
+  user_id: String,
   content: String,
   pic: String,
   timestamp: String,
-  edits: Number
+  edits: Number,
+  type: String
 })
 
 const ChatroomSchema = new mongoose.Schema({
@@ -15,6 +17,7 @@ const ChatroomSchema = new mongoose.Schema({
   id: String,
   name: String,
   owner: String,
+  owner_id: String,
   theme: String
 })
 

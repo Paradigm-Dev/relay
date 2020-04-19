@@ -14,6 +14,7 @@ router.post('/chatroom/new', (req, res) => {
     id: req.body.id,
     name: req.body.name,
     owner: req.body.owner,
+    owner_id: req.body.owner_id,
     theme: req.body.theme,
     messages: []
   }).then(data => {
@@ -58,10 +59,12 @@ router.post('/chatroom/:id/send', async (req, res) => {
   var message = {
     color: req.body.color,
     username: req.body.username,
+    user_id: req.body.user_id,
     content: req.body.content,
     pic: req.body.pic,
     timestamp: moment().format('MM/DD/YYYY [at] HH:MM a'),
-    id: mongoose.ObjectId
+    id: mongoose.ObjectId,
+    type: req.body.type
   }
   Chatroom.messages.push(message)
   await Chatroom.save()
