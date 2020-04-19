@@ -71,6 +71,7 @@ app.use('/', express.static(__dirname + '/paradigm'))
 
 // RELAY
 app.use('/relay', express.static(__dirname + '/files'))
+app.use('/relay/movies', express.static('/mnt/movies'))
 
 // ROUTES
 app.use('/api/users', require('./routes/users.js'))
