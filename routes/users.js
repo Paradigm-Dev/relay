@@ -118,7 +118,9 @@ router.get('/:uid/chatroom/:id/:func', async (req, res) => {
       })
       User.chatrooms[Index].remove()
       await User.save()
+      User.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + User.pic
       res.json(User)
+      break
   }
 })
 
