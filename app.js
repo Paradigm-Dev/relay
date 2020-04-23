@@ -69,6 +69,9 @@ app.use('/rover', express.static(__dirname + '/rover'))
 // PARADIGM
 app.use('/', express.static(__dirname + '/paradigm'))
 
+// CAMPAIGN
+app.use('/campaign', express.static(__dirname + '/campaign'))
+
 // RELAY
 app.use('/relay', express.static(__dirname + '/files'))
 app.use('/relay/movies', express.static('/mnt/movies'))
@@ -126,7 +129,7 @@ io.on('connection', async socket => {
       var newUser = await UserModel.findOne({ username: data.username })
       if (newUser != User) {
         User = newUser
-        User.pic = `https://www.theparadigmdev.com/relay/profile-pics/${User.pic}`
+        User.pic = `https://www.theparadigmdev.com/relay/profile-pics/${newUser.pic}`
         socket.emit('user', User)
       }
     }, 2000)
@@ -172,4 +175,6 @@ io.on('connection', async socket => {
   socket.on('new_chatroom', () => {
     require('./sockets/flamechat.js')(io)
   })
+
+  socket.on('kick', user => io.emit('kick', user))
 })

@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
+const moment = require('moment')
 const firebase = require('firebase/app')
 require('firebase/auth')
 require('firebase/firestore')
@@ -13,6 +14,12 @@ firebase.initializeApp({
   databaseURL: "https://paradigm-a1bc9.firebaseio.com",
   projectId: "paradigm-a1bc9",
   appId: "1:728943503114:web:4ea6a4f7b7f57e71"
+})
+
+router.get('/check/:u', (req, res) => {
+  firebase.firestore().collection('users').doc(req.params.u).get().then(doc => {
+    res.json({ exists: doc.exists })
+  })
 })
 
 router.post('/', (req, res) => {
@@ -37,11 +44,12 @@ router.post('/', (req, res) => {
                 icon: chatroom.icon
               })
             })
-            newUser.friends = [],
             newUser.rights = {
               admin: data.isAdmin,
               author: data.isWriter,
-              asteroid: data.isAsteroid
+              asteroid: data.isAsteroid,
+              patriot: false,
+              developer: false
             }
             newUser.moonrocks = data.moonrocks
             newUser.books = []
@@ -51,6 +59,7 @@ router.post('/', (req, res) => {
             newUser.banned = false
             newUser.in = false
             newUser.files = []
+            newUser.created = moment().format('dddd, MMMM Do YYYY [at] h:mm a')
       
             UserModel.create(newUser, (error, doc) => {
               if (!error) {
