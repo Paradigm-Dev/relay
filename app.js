@@ -85,6 +85,7 @@ app.use('/api/media', require('./routes/media.js'))
 app.use('/api/drawer', require('./routes/drawer.js'))
 app.use('/api/terminal', require('./routes/terminal.js'))
 app.use('/api/patriot', require('./routes/patriot.js'))
+app.use('/api/broadcast', require('./routes/broadcast.js'))
 app.use('/api', require('./routes/index.js'))
 
 mongoose.connect(`mongodb://${host}:27017/paradigm`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }).then(() => console.log('\x1b[32m', '[   DB   ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', `mongodb://${host}:27017`, '\x1b[0m', 'connected')).catch(error => console.error(error))

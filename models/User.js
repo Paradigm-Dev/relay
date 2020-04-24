@@ -39,6 +39,13 @@ const FriendSchema = new mongoose.Schema({
   pic: String
 })
 
+const PostSchema = new mongoose.Schema({
+  content: String,
+  timestamp: String,
+  likes: Number,
+  reposts: Number
+})
+
 const UserSchema = new mongoose.Schema({
   username: String,
   password: String,
@@ -50,7 +57,8 @@ const UserSchema = new mongoose.Schema({
     requests: [FriendSchema],
     approved: [FriendSchema],
     blocked: [FriendSchema],
-    sent: [FriendSchema]
+    sent: [FriendSchema],
+    blocked_by: [String]
   },
   rights: {
     admin: Boolean,
@@ -67,7 +75,8 @@ const UserSchema = new mongoose.Schema({
   banned: Boolean,
   strikes: Number,
   in: Boolean,
-  created: String
+  created: String,
+  posts: [PostSchema]
 })
 
 const UserModel = mongoose.model('user', UserSchema)
