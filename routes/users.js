@@ -150,7 +150,8 @@ router.get('/list', async (req, res) => {
       in: person.in,
       bio: person.bio,
       pic: 'https://www.theparadigmdev.com/relay/profile-pics/' + person.pic,
-      _id: person._id
+      _id: person._id,
+      posts: person.posts
     })
   })
   res.json(filtered)
@@ -158,16 +159,17 @@ router.get('/list', async (req, res) => {
 
 router.get('/:uid/info', async (req, res) => {
   var Person = await UserModel.findOne({ _id: req.params.uid })
-  console.log(Person)
-  var data = {
-    username: Person.username,
-    color: Person.color,
-    in: Person.in,
-    bio: Person.bio,
-    pic: 'https://www.theparadigmdev.com/relay/profile-pics/' + Person.pic,
-    _id: Person._id
-  }
-  res.json(data)
+  if (Person) {
+    var data = {
+      username: Person.username,
+      color: Person.color,
+      in: Person.in,
+      bio: Person.bio,
+      pic: 'https://www.theparadigmdev.com/relay/profile-pics/' + Person.pic,
+      _id: Person._id
+    }
+    res.json(data)
+  } else res.json({ error: 'This user does not exist' })
 })
 
 
@@ -580,7 +582,7 @@ router.get('/:uid/people/send/:user', async (req, res) => {
     pic: `https://www.theparadigmdev.com/relay/profile-pics/${User.pic}`
   })
   await Person.save()
-  res.json(User)
+  res.json(User.people)
 })
 
 router.get('/:uid/people/request/:user/approve', async (req, res) => {
@@ -609,7 +611,7 @@ router.get('/:uid/people/request/:user/approve', async (req, res) => {
   await User.save()
   await Person.save()
 
-  res.json(User)
+  res.json(User.people)
 })
 
 router.get('/:uid/people/request/:user/decline', async (req, res) => {
@@ -625,7 +627,7 @@ router.get('/:uid/people/request/:user/decline', async (req, res) => {
   await User.save()
   await Person.save()
 
-  res.json(User)
+  res.json(User.people)
 })
 
 router.get('/:uid/people/request/:user/retract', async (req, res) => {
@@ -641,7 +643,7 @@ router.get('/:uid/people/request/:user/retract', async (req, res) => {
   await User.save()
   await Person.save()
 
-  res.json(User)
+  res.json(User.people)
 })
 
 router.get('/:uid/people/remove/:user', async (req, res) => {
@@ -657,7 +659,41 @@ router.get('/:uid/people/remove/:user', async (req, res) => {
   await User.save()
   await Person.save()
 
-  res.json(User)
+  res.json(User.people)
+})
+
+router.get('/:uid/people/block/:user', async (req, res) => {
+  var User = await UserModel.findOne({ _id: req.params.uid })
+  var Person = await UserModel.findOne({ _id: req.params.user })
+
+  await User.people.blocked.push({
+    _id: req.params.user,
+    username: Person.username,
+    color: Person.color,
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person.pic}`
+  })
+  await Person.people.blocked_by.push(req.params.uid)
+
+  await User.save()
+  await Person.save()
+
+  res.json(User.people)
+})
+
+router.get('/:uid/people/unblock/:user', async (req, res) => {
+  var User = await UserModel.findOne({ _id: req.params.uid })
+  var Person = await UserModel.findOne({ _id: req.params.user })
+
+  var User_I = await User.people.blocked.findIndex(person => { return person._id == req.params.user })
+  var Person_I = await Person.people.blocked_by.findIndex(person => { return person == req.params.uid })
+
+  await User.people.blocked[User_I].remove()
+  await Person.people.blocked_by.splice(Person_I, 1)
+
+  await User.save()
+  await Person.save()
+
+  res.json(User.people)
 })
 
 
