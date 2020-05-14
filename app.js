@@ -18,13 +18,17 @@ const port = 443
 const host = '192.168.1.82'
 const app = express()
 
+process.title = process.argv[2]
+
 const server = https.createServer({
   key: fs.readFileSync(__dirname + '/server.key'),
   cert: fs.readFileSync(__dirname + '/server.pem')
 }, app).listen(port, host)
-console.log('\x1b[32m', '[ SERVER ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS A'), '\x1b[34m', `https://${host}:${port}`, '\x1b[0m', 'listening')
+console.log('\x1b[32m', '[ SERVER ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', `https://${host}:${port}`, '\x1b[0m', 'listening')
 
-const io = socket(server)
+const io = socket(server, {
+  // path: '/socket'
+})
 
 require('./sockets/flamechat.js')(io)
 require('./sockets/terminal.js')(io)
@@ -67,26 +71,45 @@ app.use('/rover', express.static(__dirname + '/rover'))
 // PARADIGM
 app.use('/', express.static(__dirname + '/paradigm'))
 
+// CAMPAIGN
+app.use('/campaign', express.static(__dirname + '/campaign'))
+
 // RELAY
 app.use('/relay', express.static(__dirname + '/files'))
+app.use('/relay/movies', express.static('/mnt/movies'))
 
 // ROUTES
-app.use('/users', require('./routes/users.js'))
-app.use('/users/migrate', require('./routes/migrate.js'))
-app.use('/flamechat', require('./routes/flamechat.js'))
-app.use('/paradox', require('./routes/paradox.js'))
-app.use('/media', require('./routes/media.js'))
-app.use('/drawer', require('./routes/drawer.js'))
-app.use('/terminal', require('./routes/terminal.js'))
-app.use('/patriot', require('./routes/patriot.js'))
-app.use('/', require('./routes/index.js'))
+app.use('/api/users', require('./routes/users.js'))
+app.use('/api/users/migrate', require('./routes/migrate.js'))
+app.use('/api/flamechat', require('./routes/flamechat.js'))
+app.use('/api/paradox', require('./routes/paradox.js'))
+app.use('/api/media', require('./routes/media.js'))
+app.use('/api/drawer', require('./routes/drawer.js'))
+app.use('/api/terminal', require('./routes/terminal.js'))
+app.use('/api/patriot', require('./routes/patriot.js'))
+app.use('/api/broadcast', require('./routes/broadcast.js'))
+app.use('/api', require('./routes/index.js'))
 
-mongoose.connect('mongodb://192.168.1.82:27017/paradigm', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }).then(() => console.log('\x1b[32m', '[   DB   ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS A'), '\x1b[34m', `mongodb://192.168.1.82:27017`, '\x1b[0m', 'connected')).catch(error => console.error(error))
+mongoose.connect(`mongodb://${host}:27017/paradigm`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }).then(() => console.log('\x1b[32m', '[   DB   ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', `mongodb://${host}:27017`, '\x1b[0m', 'connected')).catch(error => console.error(error))
+
+async function fixUsers() {
+  let in_users = []
+  in_users = await UserModel.find({ in: true })
+  console.log('\x1b[32m', '[  AUTH  ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', in_users.length.toString(), '\x1b[0m', in_users.length == 1 ? 'incorrectly logged in user' : 'incorrectly logged in users')
+  if (in_users.length > 0) {
+    await Promise.all(in_users.map(async User => {
+      User.in = false
+      await User.save()
+    }))
+  }
+}
+
+fixUsers()
 
 var connections = []
 
 io.on('connection', async socket => {
-  console.log('\x1b[32m', '[ SOCKET ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS A'), '\x1b[34m', socket.id, '\x1b[0m', 'connected')
+  console.log('\x1b[32m', '[ SOCKET ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', socket.id, '\x1b[0m', 'connected')
 
   var Config = await ConfigModel.find({})
   socket.emit('config', Config[0])
@@ -104,12 +127,12 @@ io.on('connection', async socket => {
     var User = await UserModel.findOne({ username: data.username })
     User.in = true
     await User.save()
-    console.log('\x1b[32m', '[  AUTH  ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS A'), '\x1b[34m', data.username, '\x1b[0m', 'logged in')
+    console.log('\x1b[32m', '[  AUTH  ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', data.username, '\x1b[0m', 'logged in')
     setInterval(async () => {
       var newUser = await UserModel.findOne({ username: data.username })
       if (newUser != User) {
         User = newUser
-        User.pic = `https://www.theparadigmdev.com/relay/profile-pics/${User.pic}`
+        User.pic = `https://www.theparadigmdev.com/relay/profile-pics/${newUser._id}.jpg`
         socket.emit('user', User)
       }
     }, 2000)
@@ -123,7 +146,7 @@ io.on('connection', async socket => {
     connections.splice(index, 1)
     User.in = false
     await User.save()
-    console.log('\x1b[32m', '[  AUTH  ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS A'), '\x1b[34m', data.username, '\x1b[0m', 'logged out')
+    console.log('\x1b[32m', '[  AUTH  ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', data.username, '\x1b[0m', 'logged out')
     socket.emit('logout')
   })
 
@@ -149,10 +172,12 @@ io.on('connection', async socket => {
       User.in = false
       await User.save()
     }
-    console.log('\x1b[32m', '[ SOCKET ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS A'), '\x1b[34m', socket.id, '\x1b[0m', 'disconnected')
+    console.log('\x1b[32m', '[ SOCKET ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', socket.id, '\x1b[0m', 'disconnected')
   })
 
   socket.on('new_chatroom', () => {
     require('./sockets/flamechat.js')(io)
   })
+
+  socket.on('kick', user => io.emit('kick', user))
 })

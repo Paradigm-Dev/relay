@@ -4,39 +4,41 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "clear && nodemon ."
+    "pre": "sudo mongod --bind_ip 192.168.1.82 &",
+    "start": "clear && nodemon . relay | tee relay.log",
+    "poststart": "kill %%",
+    "stop": "killall node"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "preferGlobal": true,
+  "bin": {
+    "p": "./cli.js"
+  },
   "dependencies": {
-    "@tensorflow/tfjs-node": "^1.7.2",
     "axios": "^0.19.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
-    "canvas": "^2.6.1",
+    "commander": "^5.1.0",
     "convert-units": "^2.3.4",
     "cors": "^2.8.5",
-    "cross-blob": "^1.2.2",
     "express": "^4.17.1",
     "express-blacklist": "^1.0.3",
     "express-defend": "^1.0.9",
-    "express-session": "^1.17.0",
-    "face-api.js": "^0.22.2",
-    "filereader": "^0.10.3",
-    "firebase": "^7.13.2",
+    "express-session": "^1.17.1",
+    "firebase": "^7.14.3",
     "formidable": "^1.2.2",
+    "hound": "^1.0.5",
     "http-proxy": "^1.18.0",
-    "jsdom": "^16.2.2",
-    "moment": "^2.24.0",
-    "mongoose": "^5.9.7",
-    "node-fetch": "^2.6.0",
+    "moment": "^2.25.3",
+    "mongoose": "^5.9.14",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "shelljs": "^0.8.3",
+    "shelljs": "^0.8.4",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.2"
+    "nodemon": "^2.0.4"
   }
 }
