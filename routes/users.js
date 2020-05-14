@@ -5,6 +5,7 @@ const passport = require('passport')
 const _path = require('path')
 const formidable = require('formidable')
 const fs = require('fs')
+const moment = require('moment')
 
 const UserModel = require('../models/User.js')
 const ChatroomModel = require('../models/Chatroom.js')
@@ -25,9 +26,10 @@ router.post('/register', (req, res) => {
         color: req.body.color,
         rights: req.body.rights,
         moonrocks: req.body.moonrocks,
+        created: moment().format('dddd, MMMM Do YYYY [at] h:mm a')
       })
 
-      fs.mkdirSync(__dirname + '/../drawer/' + newUser.username)
+      fs.mkdirSync(__dirname + '/../drawer/' + newUser._id)
 
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -52,7 +54,7 @@ router.post('/signin', (req, res, next) => {
       res.json({ msg: 'The username and password does not match an account.' })
     }
     if (!err && user) {
-      user.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + user.pic
+      user.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + user._id + '.jpg'
       res.json(user)
       req.login(user, next)
     }
@@ -83,13 +85,93 @@ router.post('/reset', async (req, res) => {
 
 router.post('/update', async (req, res) => {
   var user = await UserModel.findOne({ username: req.body.old })
+
   user.username = req.body.username
   user.bio = req.body.bio
   user.color = req.body.color
+
   await user.save()
-  user.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + user.pic
+
+  // var people_to_update = []
+  user.people.sent.forEach(async person => {
+    var Person = await UserModel.findOne({ _id: person._id })
+    var Index = Person.people.requests.findIndex(request => { return request._id == user._id })
+    Person.people.requests[Index].username = req.body.username
+    Person.people.requests[Index]._id = user._id
+    Person.people.requests[Index].color = req.body.color
+    await Person.save()
+  })
+
+  user.people.requests.forEach(async person => {
+    var Person = await UserModel.findOne({ _id: person._id })
+    var Index = Person.people.sent.findIndex(request => { return request._id == user._id })
+    Person.people.sent[Index].username = req.body.username
+    Person.people.sent[Index]._id = user._id
+    Person.people.sent[Index].color = req.body.color
+    await Person.save()
+  })
+
+  user.people.approved.forEach(async person => {
+    var Person = await UserModel.findOne({ _id: person._id })
+    var Index = Person.people.approved.findIndex(request => { return request._id == user._id })
+    Person.people.approved[Index].username = req.body.username
+    Person.people.approved[Index]._id = user._id
+    Person.people.approved[Index].color = req.body.color
+    await Person.save()
+  })
+
+  // user.people.requests.forEach(person => people_to_update.push(person._id))
+  user.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + user._id + '.jpg'
+
   res.json(user)
 })
+
+router.get('/check/:u', async (req, res) => {
+  var data = {
+    exists: false,
+    in: false
+  }
+  var User = await UserModel.findOne({ username: req.params.u })
+  if (User) {
+    data.exists = true
+    if (User.in) data.in = true
+    else data.in = false
+  } else data.exists = false
+  res.json(data)
+})
+
+router.get('/list', async (req, res) => {
+  var People = await UserModel.find({})
+  var filtered = []
+  People.forEach(person => {
+    filtered.push({
+      username: person.username,
+      color: person.color,
+      in: person.in,
+      bio: person.bio,
+      pic: 'https://www.theparadigmdev.com/relay/profile-pics/' + person._id + '.jpg',
+      _id: person._id,
+      posts: person.posts
+    })
+  })
+  res.json(filtered)
+})
+
+router.get('/:uid/info', async (req, res) => {
+  var Person = await UserModel.findOne({ _id: req.params.uid })
+  if (Person) {
+    var data = {
+      username: Person.username,
+      color: Person.color,
+      in: Person.in,
+      bio: Person.bio,
+      pic: 'https://www.theparadigmdev.com/relay/profile-pics/' + Person._id + '.jpg',
+      _id: Person._id
+    }
+    res.json(data)
+  } else res.json({ error: 'This user does not exist' })
+})
+
 
 // Chatroom functions
 router.get('/:uid/chatroom/:id/:func', async (req, res) => {
@@ -104,7 +186,7 @@ router.get('/:uid/chatroom/:id/:func', async (req, res) => {
             icon: data.icon
           })
           await User.save()
-          User.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + User.pic
+          User.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + User._id + '.jpg'
           res.json(User)
         }
       })
@@ -116,7 +198,9 @@ router.get('/:uid/chatroom/:id/:func', async (req, res) => {
       })
       User.chatrooms[Index].remove()
       await User.save()
+      User.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + User._id + '.jpg'
       res.json(User)
+      break
   }
 })
 
@@ -130,7 +214,7 @@ router.get('/:uid/moonrocks/:diff', (req, res) => {
 
 // Get list of files in Drawer
 router.get('/:uid/drawer/list', (req, res) => {
-  UserModel.findOne({ username: req.params.uid }, (error, data) => {
+  UserModel.findOne({ _id: req.params.uid }, (error, data) => {
     if (!error) res.json(data.files)
     else {
       console.error(error)
@@ -142,24 +226,25 @@ router.get('/:uid/drawer/list', (req, res) => {
 // Get profile pic
 router.get('/:uid/pic', async (req, res) => {
   var User = await UserModel.findOne({ username: req.params.uid })
-  res.sendFile(_path.join(__dirname + '/../files/profile-pics/' + User.pic + '.jpg'))
+  res.sendFile(_path.join(__dirname + '/../files/profile-pics/' + User._id + '.jpg'))
 })
 
 // Post profile pic
-router.post('/:uid/pic', (req, res) => {
-  var form = new formidable.IncomingForm()
+router.post('/:uid/pic', async (req, res) => {
+  var User = await UserModel.findOne({ username: req.params.uid })
+  var file
 
-  form.parse(req)
+  const form = formidable({ multiples: false, uploadDir: __dirname + '/../files/profile-pics/', keepExtensions: true })
 
-  form.on('fileBegin', (name, file) => {
-    file.path = __dirname + '/../files/profile-pics/' + req.params.uid + '.jpg'
-  })
-
-  form.on('end', async () => {
-    var User = await UserModel.findOne({ username: req.params.uid })
-    User.pic = User.username + '.jpg'
-    await User.save()
-    User.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + User.pic
+  await form.parse(req, async (err, fields, files) => {
+    if (err) {
+      next(err)
+      return
+    }
+    
+    file = files['files[0]']
+    await fs.renameSync(file.path, __dirname + '/../files/profile-pics/' + User._id + '.jpg')
+    User.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + User._id + '.jpg'
     res.json(User)
   })
 })
@@ -182,7 +267,7 @@ router.get('/:uid/delete', async (req, res) => {
         })
       }
       fs.rmdir(path, async error => {
-        fs.unlink(_path.join(__dirname + '/../files/profile-pics/' + User.pic), async error => {
+        fs.unlink(_path.join(__dirname + '/../files/profile-pics/' + User._id + '.jpg'), async error => {
           if (error) console.error(error)
           await UserModel.findOneAndDelete({ username: req.params.uid })
           res.end()
@@ -190,7 +275,7 @@ router.get('/:uid/delete', async (req, res) => {
       })
     })
   }
-  deleteFolderRecursive(__dirname + '/../drawer/' + req.params.uid)
+  deleteFolderRecursive(__dirname + '/../drawer/' + User._id)
 })
 
 
@@ -480,5 +565,150 @@ router.post('/:uid/media/music/:id/update', async (req, res) => {
   var saved = await user.save()
   res.json(saved)
 })
+
+router.get('/:uid/people/send/:user', async (req, res) => {
+  var User = await UserModel.findOne({ _id: req.params.uid })
+  var Person = await UserModel.findOne({ _id: req.params.user })
+  await User.people.sent.push({
+    _id: req.params.user,
+    username: Person.username,
+    color: Person.color,
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`
+  })
+  await User.save()
+  await Person.people.requests.push({
+    _id: req.params.uid,
+    username: User.username,
+    color: User.color,
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`
+  })
+  await Person.save()
+  res.json(User.people)
+})
+
+router.get('/:uid/people/request/:user/approve', async (req, res) => {
+  var User = await UserModel.findOne({ _id: req.params.uid })
+  var Person = await UserModel.findOne({ _id: req.params.user })
+
+  var User_I = await User.people.requests.findIndex(person => { return person._id == req.params.user })
+  var Person_I = await Person.people.sent.findIndex(person => { return person._id == req.params.uid })
+
+  await User.people.requests[User_I].remove()
+  await Person.people.sent[Person_I].remove()
+
+  await User.people.approved.push({
+    _id: req.params.user,
+    username: Person.username,
+    color: Person.color,
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`
+  })
+  await Person.people.approved.push({
+    _id: req.params.uid,
+    username: User.username,
+    color: User.color,
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`
+  })
+
+  await User.save()
+  await Person.save()
+
+  res.json(User.people)
+})
+
+router.get('/:uid/people/request/:user/decline', async (req, res) => {
+  var User = await UserModel.findOne({ _id: req.params.uid })
+  var Person = await UserModel.findOne({ _id: req.params.user })
+
+  var User_I = await User.people.requests.findIndex(person => { return person._id == req.params.user })
+  var Person_I = await Person.people.sent.findIndex(person => { return person._id == req.params.uid })
+
+  await User.people.requests[User_I].remove()
+  await Person.people.sent[Person_I].remove()
+
+  await User.save()
+  await Person.save()
+
+  res.json(User.people)
+})
+
+router.get('/:uid/people/request/:user/retract', async (req, res) => {
+  var User = await UserModel.findOne({ _id: req.params.uid })
+  var Person = await UserModel.findOne({ _id: req.params.user })
+
+  var User_I = await User.people.sent.findIndex(person => { return person._id == req.params.user })
+  var Person_I = await Person.people.requests.findIndex(person => { return person._id == req.params.uid })
+
+  await User.people.sent[User_I].remove()
+  await Person.people.requests[Person_I].remove()
+
+  await User.save()
+  await Person.save()
+
+  res.json(User.people)
+})
+
+router.get('/:uid/people/remove/:user', async (req, res) => {
+  var User = await UserModel.findOne({ _id: req.params.uid })
+  var Person = await UserModel.findOne({ _id: req.params.user })
+
+  var User_I = await User.people.approved.findIndex(person => { return person._id == req.params.user })
+  var Person_I = await Person.people.approved.findIndex(person => { return person._id == req.params.uid })
+
+  await User.people.approved[User_I].remove()
+  await Person.people.approved[Person_I].remove()
+
+  await User.save()
+  await Person.save()
+
+  res.json(User.people)
+})
+
+router.get('/:uid/people/block/:user', async (req, res) => {
+  var User = await UserModel.findOne({ _id: req.params.uid })
+  var Person = await UserModel.findOne({ _id: req.params.user })
+
+  await User.people.blocked.push({
+    _id: req.params.user,
+    username: Person.username,
+    color: Person.color,
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`
+  })
+  await Person.people.blocked_by.push(req.params.uid)
+
+  await User.save()
+  await Person.save()
+
+  res.json(User.people)
+})
+
+router.get('/:uid/people/unblock/:user', async (req, res) => {
+  var User = await UserModel.findOne({ _id: req.params.uid })
+  var Person = await UserModel.findOne({ _id: req.params.user })
+
+  var User_I = await User.people.blocked.findIndex(person => { return person._id == req.params.user })
+  var Person_I = await Person.people.blocked_by.findIndex(person => { return person == req.params.uid })
+
+  await User.people.blocked[User_I].remove()
+  await Person.people.blocked_by.splice(Person_I, 1)
+
+  await User.save()
+  await Person.save()
+
+  res.json(User.people)
+})
+
+
+
+// router.get('/:uid/people', async (req, res) => {
+//   var User = await UserModel.findOne({ _id: req.params.uid })
+//   var People = []
+//   await User.people.forEach(async person => {
+//     var Person = await UserModel.findOne({ _id: person._id })
+
+//     People.push(Person)
+//   }),
+//   console.log(People)
+//   if (a_done && r_done && s_done && b_done) res.json(People)
+// })
 
 module.exports = router

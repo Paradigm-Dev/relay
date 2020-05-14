@@ -24,18 +24,27 @@ const StoredChatroomSchema = new mongoose.Schema({
   icon: String
 })
 
-const FriendSchema = new mongoose.Schema({
-  username: String,
-  pic: String,
-  color: String
-})
-
 const FileSchema = new mongoose.Schema({
   name: String,
   type: String,
   size: String,
   date: String,
   path: String
+})
+
+const FriendSchema = new mongoose.Schema({
+  _id: String,
+  username: String,
+  color: String,
+  pic: String,
+  liked_posts: [String]
+})
+
+const PostSchema = new mongoose.Schema({
+  content: String,
+  timestamp: String,
+  likes: Number,
+  reposts: Number
 })
 
 const UserSchema = new mongoose.Schema({
@@ -45,12 +54,19 @@ const UserSchema = new mongoose.Schema({
   color: String,
   pic: String,
   chatrooms: [StoredChatroomSchema],
-  friends: [FriendSchema],
+  people: {
+    requests: [FriendSchema],
+    approved: [FriendSchema],
+    blocked: [FriendSchema],
+    sent: [FriendSchema],
+    blocked_by: [String]
+  },
   rights: {
     admin: Boolean,
     author: Boolean,
     asteroid: Boolean,
-    patriot: Boolean
+    patriot: Boolean,
+    developer: Boolean
   },
   moonrocks: Number,
   books: [UserBookSchema],
@@ -59,7 +75,9 @@ const UserSchema = new mongoose.Schema({
   files: [FileSchema],
   banned: Boolean,
   strikes: Number,
-  in: Boolean
+  in: Boolean,
+  created: String,
+  posts: [PostSchema]
 })
 
 const UserModel = mongoose.model('user', UserSchema)
