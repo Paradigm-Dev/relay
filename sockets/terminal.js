@@ -1,9 +1,13 @@
 const shell = require('shelljs')
+const fs = require('fs')
 const ConfigModel = require('./../models/Config.js')
 const UserModel = require('./../models/User.js')
 
 module.exports = io => {
   var terminal = io.of('/terminal').on('connection', async socket => {
+    var log = fs.readFileSync(__dirname + '/../log.txt')
+    socket.emit('log', log)
+
     socket.on('config', async data => {
       var newConfig = await ConfigModel.findOne({ find: 'this' })
       await newConfig.overwrite(data.config)
