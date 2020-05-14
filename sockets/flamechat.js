@@ -6,17 +6,18 @@ module.exports = io => {
     if (error) console.error(error)
     else {
       data.forEach(chatroom => {
+        let typers = []
         var namespace = io.of(`/flamechat/${chatroom.id}`).on('connection', async socket => {
           var chatroom_id = chatroom.id
           var Chatroomed = await ChatroomModel.findOne({ id: chatroom_id })
           socket.emit('data', Chatroomed)
-          socket.on('message', async data => {
+          socket.on('send', async data => {
             var data = data
             var Chatroom = await ChatroomModel.findOne({ id: chatroom_id })
             data._id = mongoose.Types.ObjectId()
             await Chatroom.messages.push(data)
             await Chatroom.save()
-            namespace.emit('message', data)
+            namespace.emit('send', data)
           })
           socket.on('delete', async id => {
             var Chatroom = await ChatroomModel.findOne({ id: chatroom_id })
@@ -39,16 +40,33 @@ module.exports = io => {
               _id: mongoose.Types.ObjectId(),
               color: data.color,
               username: data.username,
+              user_id: data.user_id,
               content: data.content,
               pic: data.pic,
               timestamp: data.timestamp,
-              edits: data.edits + 1
+              edits: data.edits + 1,
+              type: data.type
             }
             Chatroom.messages[MessageIndex] = Data
-            console.log(Chatroom)
             await Chatroom.save()
             Data.oldID = oldID
             namespace.emit('edit', Data)
+          })
+          socket.on('typing', async data => {
+            let exists = false
+            typers.forEach(typer => {
+              if (typer.user == data.user) exists = true
+            })
+            if (exists && data.is === false) {
+              const index = typers.findIndex(typer => {
+                return typer == data.user
+              })
+              typers.splice(index, 1)
+            }
+            else if (!exists && data.is === true) {
+              typers.splice(typers.length, 0, data)
+            }
+            namespace.emit('typing', typers)
           })
         })
       })
