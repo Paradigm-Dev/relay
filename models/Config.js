@@ -6,7 +6,11 @@ const RouterConfigSchema = new mongoose.Schema({
   paradox: Boolean,
   drawer: Boolean,
   media: Boolean,
-  home: Boolean
+  home: Boolean,
+  corona: Boolean,
+  write: Boolean,
+  people: Boolean,
+  broadcast: Boolean
 })
 
 const ConfigSchema = new mongoose.Schema({
