@@ -56,5 +56,11 @@ module.exports = io => {
       await io.emit('nuke')
       shell.exec('sudo shutdown -h now')
     })
+
+    socket.on('ip', async ip => {
+      var Config = await ConfigModel.findOne({ find: 'this' })
+      Config.banned.push(ip)
+      await Config.save()
+    })
   })  
 }

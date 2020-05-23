@@ -19,7 +19,8 @@ const ConfigSchema = new mongoose.Schema({
   reset: Boolean,
   shutdown: Boolean,
   router: RouterConfigSchema,
-  find: String
+  find: String,
+  banned: [String]
 }, { collection: 'config' })
 
 const ConfigModel = mongoose.model('config', ConfigSchema)
