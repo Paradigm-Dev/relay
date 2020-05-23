@@ -21,7 +21,8 @@ const UserMusicSchema = new mongoose.Schema({
 const StoredChatroomSchema = new mongoose.Schema({
   name: String,
   id: String,
-  icon: String
+  icon: String,
+  status: String
 })
 
 const FileSchema = new mongoose.Schema({

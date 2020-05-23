@@ -78,6 +78,9 @@ app.use('/campaign', express.static(__dirname + '/campaign'))
 app.use('/relay', express.static(__dirname + '/files'))
 app.use('/relay/movies', express.static('/mnt/movies'))
 
+// FLAMECHAT
+app.use('/flamechat/chatroom', express.static(__dirname + '/flamechat'))
+
 // ROUTES
 app.use('/api/users', require('./routes/users.js'))
 app.use('/api/users/migrate', require('./routes/migrate.js'))

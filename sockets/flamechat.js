@@ -1,5 +1,6 @@
 const ChatroomModel = require('./../models/Chatroom.js')
 const mongoose = require('mongoose')
+const fs = require('fs')
 
 module.exports = io => {
   ChatroomModel.find({}, (error, data) => {
@@ -22,12 +23,17 @@ module.exports = io => {
           socket.on('delete', async id => {
             var Chatroom = await ChatroomModel.findOne({ id: chatroom_id })
             var Message = await Chatroom.messages.id(id)
+            if (Message.type == 'file') await fs.unlinkSync(__dirname + `/../flamechat/${Chatroom.id}/${Message.content}`)
             await Message.remove()
             await Chatroom.save()
             namespace.emit('delete', id)
           })
           socket.on('kill', () => {
             namespace.emit('kill')
+          })
+          socket.on('people', async id => {
+            var Chatroom = await ChatroomModel.findOne({ id: id })
+            namespace.emit('people', Chatroom.people)
           })
           socket.on('edit', async data => {
             var Chatroom = await ChatroomModel.findOne({ id: chatroom_id })
@@ -68,6 +74,7 @@ module.exports = io => {
             }
             namespace.emit('typing', typers)
           })
+          socket.on('purge', () => namespace.emit('purge'))
         })
       })
     }

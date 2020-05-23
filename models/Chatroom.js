@@ -8,7 +8,15 @@ const MessageSchema = new mongoose.Schema({
   pic: String,
   timestamp: String,
   edits: Number,
-  type: String
+  type: String,
+  url: String
+})
+
+const PersonSchema = new mongoose.Schema({
+  _id: String,
+  username: String,
+  color: String,
+  pic: String
 })
 
 const ChatroomSchema = new mongoose.Schema({
@@ -17,8 +25,12 @@ const ChatroomSchema = new mongoose.Schema({
   id: String,
   name: String,
   owner: String,
-  owner_id: String,
-  theme: String
+  theme: String,
+  people: {
+    approved: [PersonSchema],
+    requested: [PersonSchema],
+    banned: [PersonSchema]
+  }
 })
 
 const ChatroomModel = mongoose.model('chatroom', ChatroomSchema)

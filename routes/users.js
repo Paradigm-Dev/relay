@@ -176,23 +176,35 @@ router.get('/:uid/info', async (req, res) => {
 // Chatroom functions
 router.get('/:uid/chatroom/:id/:func', async (req, res) => {
   switch (req.params.func) {
-    case 'add':
-      ChatroomModel.findOne({ id: req.params.id }, async (error, data) => {
-        if (!error) {
-          var User = await UserModel.findOne({ username: req.params.uid })
-          User.chatrooms.push({
-            name: data.name,
-            id: data.id,
-            icon: data.icon
-          })
-          await User.save()
-          User.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + User._id + '.jpg'
-          res.json(User)
-        }
-      })
+    case 'request':
+      var Chatroom = await ChatroomModel.findOne({ id: req.params.id })
+      var User = await UserModel.findOne({ _id: req.params.uid })
+
+      var banned = false
+      await Chatroom.people.banned.forEach(person => { console.log(person._id); if (req.params.user == person._id) banned = true; })
+    
+      if (!banned) {
+        console.log('not banned')
+        Chatroom.people.requested.push({
+          _id: User._id,
+          username: User.username,
+          color: User.color,
+          pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`
+        })
+        User.chatrooms.push({
+          name: Chatroom.name,
+          id: Chatroom.id,
+          icon: Chatroom.icon,
+          status: 'requested'
+        })
+        await Chatroom.save()
+        await User.save()
+        User.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + User._id + '.jpg'
+        res.json(User)
+      } else res.json({ error: 'banned' })
       break
     case 'leave':
-      var User = await UserModel.findOne({ username: req.params.uid })
+      var User = await UserModel.findOne({ _id: req.params.uid })
       var Index = User.chatrooms.findIndex(chatroom => {
         return chatroom.id == req.params.id
       })
