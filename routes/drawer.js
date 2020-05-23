@@ -66,7 +66,7 @@ router.post('/:uid/upload/write', (req, res) => {
       if (!exists) User.files.push({
         name: req.body.title,
         type: 'workshop/write',
-        size: stats.size + 'B',
+        size: stats.size + ' B',
         date: moment().format('MM/DD/YYYY [at] HH:MM a'),
         path: `${req.body.title}.write.json`
       })
@@ -91,7 +91,7 @@ router.post('/:uid/upload/sales', (req, res) => {
       if (!exists) User.files.push({
         name: req.body.title,
         type: 'workshop/sales',
-        size: stats.size + 'B',
+        size: stats.size + ' B',
         date: moment().format('MM/DD/YYYY [at] HH:MM a'),
         path: `${req.body.title}.sales.json`
       })
