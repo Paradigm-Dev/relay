@@ -1,3 +1,11 @@
+/*
+  Copyright (c) 2020, Paradigm. All rights reserved.
+  NOTE: By accessing data in our database, you agree to the Terms and Conditions:
+  https://github.com/Paradigm-Dev/paradigm/blob/master/TERMS.md
+  All files within this directory and subdirectories adhere to these terms,
+  and so do YOU!
+*/
+
 const express = require('express')
 const mongoose = require('mongoose')
 const session = require('express-session')
@@ -8,8 +16,6 @@ const socket = require('socket.io')
 const https = require('https')
 const fs = require('fs')
 const moment = require('moment')
-const expressDefend = require('express-defend')
-const blacklist = require('express-blacklist')
 
 const ConfigModel = require('./models/Config.js')
 const UserModel = require('./models/User.js')
@@ -34,18 +40,6 @@ require('./sockets/flamechat.js')(io)
 require('./sockets/terminal.js')(io)
 
 mongoose.promise = global.Promise
-
-app.use(blacklist.blockRequests('./blacklist.txt'))
-app.use(expressDefend.protect({ 
-  maxAttempts: 5,
-  dropSuspiciousRequest: true,
-  consoleLogging: true,
-  logFile: './suspicious.log',
-  onMaxAttemptsReached: async function(ipAddress, url){
-    console.log('IP address ' + ipAddress + ' is considered to be malicious, URL: ' + url)
-    await blacklist.addAddress(ipAddress)
-  } 
-}))
 
 app.use(cors())
 
@@ -184,3 +178,5 @@ io.on('connection', async socket => {
 
   socket.on('kick', user => io.emit('kick', user))
 })
+
+console.log('\x1b[32m', '[  NOTE  ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', 'By accessing our database,' , '\x1b[0m', 'you agree to the Terms and Conditions')
