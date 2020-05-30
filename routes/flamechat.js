@@ -7,6 +7,7 @@ const fs = require('fs')
 const formidable = require('formidable')
 
 const ChatroomModel = require('../models/Chatroom.js')
+const DMModel = require('../models/DM.js')
 const UserModel = require('../models/User.js')
 
 // New chatroom
@@ -37,7 +38,7 @@ router.post('/chatroom/new', (req, res) => {
           pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`
         })
         await User.save()
-        await fs.mkdirSync(__dirname + `/../flamechat/${data.id}`)
+        await fs.mkdirSync(__dirname + `/../flamechat/chatroom/${data.id}`)
         res.json(data)
       }
     })
@@ -69,13 +70,29 @@ router.post('/chatroom/:id/file', async (req, res) => {
   var Chatroom = await ChatroomModel.findOne({ id: req.params.id })
   var file
 
-  const form = formidable({ multiples: false, uploadDir: __dirname + '/../flamechat/' + Chatroom.id, keepExtensions: true })
+  const form = formidable({ multiples: false, uploadDir: __dirname + '/../flamechat/chatroom/' + Chatroom.id, keepExtensions: true })
 
   await form.parse(req, async (error, fields, files) => {
     if (error) console.error(error)
     
     file = files.file
-    await fs.renameSync(file.path, __dirname + '/../flamechat/' + Chatroom.id + '/' + file.name)
+    await fs.renameSync(file.path, __dirname + '/../flamechat/chatroom/' + Chatroom.id + '/' + file.name)
+    res.end()
+  })
+})
+
+// Send file
+router.post('/dm/:id/file', async (req, res) => {
+  var DM_data = await DMModel.findOne({ _id: req.params.id })
+  var file
+
+  const form = formidable({ multiples: false, uploadDir: __dirname + '/../flamechat/dm/' + DM_data._id, keepExtensions: true })
+
+  await form.parse(req, async (error, fields, files) => {
+    if (error) console.error(error)
+    
+    file = files.file
+    await fs.renameSync(file.path, __dirname + '/../flamechat/dm/' + DM_data._id + '/' + file.name)
     res.end()
   })
 })

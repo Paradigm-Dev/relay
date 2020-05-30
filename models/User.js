@@ -38,7 +38,8 @@ const FriendSchema = new mongoose.Schema({
   username: String,
   color: String,
   pic: String,
-  liked_posts: [String]
+  liked_posts: [String],
+  dm: String
 })
 
 const PostSchema = new mongoose.Schema({

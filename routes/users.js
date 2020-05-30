@@ -9,6 +9,7 @@ const moment = require('moment')
 
 const UserModel = require('../models/User.js')
 const ChatroomModel = require('../models/Chatroom.js')
+const DMModel = require('../models/DM.js')
 const BookModel = require('../models/Book.js')
 const MovieModel = require('../models/Movie.js')
 const MusicModel = require('../models/Music.js')
@@ -281,6 +282,25 @@ router.get('/:uid/delete', async (req, res) => {
       fs.rmdir(path, async error => {
         fs.unlink(_path.join(__dirname + '/../files/profile-pics/' + User._id + '.jpg'), async error => {
           if (error) console.error(error)
+          var User = await UserModel.findOne({ username: req.params.uid })
+          User.people.approved.forEach(async person => {
+            var Person = await UserModel.findOne({ _id: person._id })
+            var Index = await Person.people.approved.findIndex(request => { return request._id == user._id })
+            await Person.people.approved.splice(Index, 1)
+            await Person.save()
+          })
+          User.people.requests.forEach(async person => {
+            var Person = await UserModel.findOne({ _id: person._id })
+            var Index = await Person.people.sent.findIndex(request => { return request._id == user._id })
+            await Person.people.approved.splice(Index, 1)
+            await Person.save()
+          })
+          User.people.sent.forEach(async person => {
+            var Person = await UserModel.findOne({ _id: person._id })
+            var Index = await Person.people.requests.findIndex(request => { return request._id == user._id })
+            await Person.people.approved.splice(Index, 1)
+            await Person.save()
+          })
           await UserModel.findOneAndDelete({ username: req.params.uid })
           res.end()
         })
@@ -585,14 +605,16 @@ router.get('/:uid/people/send/:user', async (req, res) => {
     _id: req.params.user,
     username: Person.username,
     color: Person.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`,
+    dm: ''
   })
   await User.save()
   await Person.people.requests.push({
     _id: req.params.uid,
     username: User.username,
     color: User.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
+    dm: ''
   })
   await Person.save()
   res.json(User.people)
@@ -608,17 +630,39 @@ router.get('/:uid/people/request/:user/approve', async (req, res) => {
   await User.people.requests[User_I].remove()
   await Person.people.sent[Person_I].remove()
 
+  var new_dm = await DMModel.create({
+    messages: [],
+    people: [
+      {
+        _id: User._id,
+        username: User.username,
+        color: User.color,
+        pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`
+      },
+      {
+        _id: Person._id,
+        username: Person.username,
+        color: Person.color,
+        pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`
+      }
+    ]
+  })
+
+  await fs.mkdirSync(__dirname + `/../flamechat/dm/${new_dm._id}`)
+
   await User.people.approved.push({
     _id: req.params.user,
     username: Person.username,
     color: Person.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`,
+    dm: new_dm._id
   })
   await Person.people.approved.push({
     _id: req.params.uid,
     username: User.username,
     color: User.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
+    dm: new_dm._id
   })
 
   await User.save()
@@ -666,6 +710,8 @@ router.get('/:uid/people/remove/:user', async (req, res) => {
   var User_I = await User.people.approved.findIndex(person => { return person._id == req.params.user })
   var Person_I = await Person.people.approved.findIndex(person => { return person._id == req.params.uid })
 
+  await DMModel.findOneAndDelete({ _id: User.dm })
+
   await User.people.approved[User_I].remove()
   await Person.people.approved[Person_I].remove()
 
@@ -683,7 +729,8 @@ router.get('/:uid/people/block/:user', async (req, res) => {
     _id: req.params.user,
     username: Person.username,
     color: Person.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`
+    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`,
+    dm: ''
   })
   await Person.people.blocked_by.push(req.params.uid)
 
