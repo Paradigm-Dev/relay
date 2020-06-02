@@ -158,6 +158,15 @@ router.get('/list', async (req, res) => {
   res.json(filtered)
 })
 
+router.get('/shortlist', async (req, res) => {
+  var People = await UserModel.find({})
+  var filtered = []
+  People.forEach(person => {
+    filtered.push(person.username)
+  })
+  res.json(filtered)
+})
+
 router.get('/:uid/info', async (req, res) => {
   var Person = await UserModel.findOne({ _id: req.params.uid })
   if (Person) {
