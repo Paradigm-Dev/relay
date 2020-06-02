@@ -10,7 +10,8 @@ const RouterConfigSchema = new mongoose.Schema({
   corona: Boolean,
   write: Boolean,
   people: Boolean,
-  broadcast: Boolean
+  broadcast: Boolean,
+  transmission: Boolean
 })
 
 const ConfigSchema = new mongoose.Schema({
