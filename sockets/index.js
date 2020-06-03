@@ -73,7 +73,7 @@ module.exports = io => {
     })
 
     socket.on('new_chatroom', () => {
-      require('./sockets/flamechat.js')(io)
+      require('../sockets/flamechat.js')(io)
     })
 
     socket.on('kick', user => io.emit('kick', user))
