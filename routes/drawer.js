@@ -67,7 +67,7 @@ router.post('/:uid/upload/write', (req, res) => {
         name: req.body.title,
         type: 'workshop/write',
         size: stats.size + ' B',
-        date: moment().format('MM/DD/YYYY [at] HH:MM a'),
+        date: moment().format('MM/DD/YYYY [at] h:mm a'),
         path: `${req.body.title}.write.json`
       })
       await User.save()
@@ -92,7 +92,7 @@ router.post('/:uid/upload/sales', (req, res) => {
         name: req.body.title,
         type: 'workshop/sales',
         size: stats.size + ' B',
-        date: moment().format('MM/DD/YYYY [at] HH:MM a'),
+        date: moment().format('MM/DD/YYYY [at] h:mm a'),
         path: `${req.body.title}.sales.json`
       })
       await User.save()
@@ -123,7 +123,7 @@ router.post('/:uid/upload', (req, res) => {
       name: file.name.slice(0, file.name.lastIndexOf('.')),
       type: file.type,
       size: file.size + ' B',
-      date: moment().format('MM/DD/YYYY [at] HH:MM a'),
+      date: moment().format('MM/DD/YYYY [at] h:mm a'),
       path: file.name
     })
     await User.save()

@@ -49,12 +49,12 @@ module.exports = io => {
 
     socket.on('list', async query => {
       var data = []
-      connections.forEach(connection => {
+      for (var i = 0; i < connections.length; i++) {
         data.push({
-          username: connection.username,
-          socket: connection.socket
+          username: connections[i].username,
+          socket: connections[i].socket.id
         })
-      })
+      }
       socket.emit('list', data)
     })
 

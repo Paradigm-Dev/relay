@@ -24,7 +24,7 @@ module.exports = io => {
           socket.on('delete', async id => {
             var Chatroom = await ChatroomModel.findOne({ id: chatroom_id })
             var Message = await Chatroom.messages.id(id)
-            if (Message.type == 'file') await fs.unlinkSync(__dirname + `/../flamechat/chatroom/${Chatroom.id}/${Message.content}`)
+            if (Message.type == 'file') await fs.unlinkSync(__dirname + `/../files/flamechat/chatroom/${Chatroom.id}/${Message.content}`)
             await Message.remove()
             await Chatroom.save()
             namespace.emit('delete', id)
@@ -100,7 +100,7 @@ module.exports = io => {
           socket.on('delete', async id => {
             var dm_delete = await DMModel.findOne({ _id: dm._id })
             var Message = await dm_delete.messages.id(id)
-            if (Message.type == 'file') await fs.unlinkSync(__dirname + `/../flamechat/dm/${dm._id}/${Message.content}`)
+            if (Message.type == 'file') await fs.unlinkSync(__dirname + `/../files/flamechat/dm/${dm._id}/${Message.content}`)
             await Message.remove()
             await dm_delete.save()
             namespace.emit('delete', id)
