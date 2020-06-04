@@ -43,7 +43,15 @@ require('./sockets/transmission.js')(io)
 
 mongoose.promise = global.Promise
 
-app.use(cors())
+app.use(cors({
+  origin: [
+    'https://www.theparadigmdev.com',
+    'https://theparadigmdev.com',
+    'https://liddy.cf',
+    'https://www.liddy.cf',
+    'https://localhost:8080'
+  ]
+}))
 
 app.use(bodyParser.json())
 
@@ -73,10 +81,6 @@ app.use('/campaign', express.static(__dirname + '/campaign'))
 // RELAY
 app.use('/relay', express.static(__dirname + '/files'))
 app.use('/relay/movies', express.static('/mnt/movies'))
-
-// FLAMECHAT
-app.use('/flamechat/chatroom', express.static(__dirname + '/flamechat/chatroom'))
-app.use('/flamechat/dm', express.static(__dirname + '/flamechat/dm'))
 
 // ROUTES
 app.use('/api/users', require('./routes/users.js'))
