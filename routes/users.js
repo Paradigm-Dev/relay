@@ -52,7 +52,7 @@ router.post('/signin', (req, res, next) => {
       return next(err)
     }
     if (!user) {
-      res.json({ msg: 'The username and password does not match an account.' })
+      res.json({ msg: 'The username and password do not match an account.' })
     }
     if (!err && user) {
       user.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + user._id + '.jpg'
@@ -119,6 +119,11 @@ router.post('/update', async (req, res) => {
     Person.people.approved[Index]._id = user._id
     Person.people.approved[Index].color = req.body.color
     await Person.save()
+    var DM = await DMModel.findOne({ _id: user.people.approved[Index].dm })
+    var DM_index = DM.people.findIndex(person => { return person._id == user._id })
+    DM.people[DM_index].username = req.body.username
+    DM.people[DM_index].color = req.body.color
+    DM.save()
   })
 
   // user.people.requests.forEach(person => people_to_update.push(person._id))
