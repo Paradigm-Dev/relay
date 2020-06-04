@@ -70,13 +70,13 @@ router.post('/chatroom/:id/file', async (req, res) => {
   var Chatroom = await ChatroomModel.findOne({ id: req.params.id })
   var file
 
-  const form = formidable({ multiples: false, uploadDir: __dirname + '/../flamechat/chatroom/' + Chatroom.id, keepExtensions: true })
+  const form = formidable({ multiples: false, uploadDir: __dirname + '/../files/flamechat/chatroom/' + Chatroom.id, keepExtensions: true })
 
   await form.parse(req, async (error, fields, files) => {
     if (error) console.error(error)
     
     file = files.file
-    await fs.renameSync(file.path, __dirname + '/../flamechat/chatroom/' + Chatroom.id + '/' + file.name)
+    await fs.renameSync(file.path, __dirname + '/../files/flamechat/chatroom/' + Chatroom.id + '/' + file.name)
     res.end()
   })
 })
@@ -86,13 +86,13 @@ router.post('/dm/:id/file', async (req, res) => {
   var DM_data = await DMModel.findOne({ _id: req.params.id })
   var file
 
-  const form = formidable({ multiples: false, uploadDir: __dirname + '/../flamechat/dm/' + DM_data._id, keepExtensions: true })
+  const form = formidable({ multiples: false, uploadDir: __dirname + '/../files/flamechat/dm/' + DM_data._id, keepExtensions: true })
 
   await form.parse(req, async (error, fields, files) => {
     if (error) console.error(error)
     
     file = files.file
-    await fs.renameSync(file.path, __dirname + '/../flamechat/dm/' + DM_data._id + '/' + file.name)
+    await fs.renameSync(file.path, __dirname + '/../files/flamechat/dm/' + DM_data._id + '/' + file.name)
     res.end()
   })
 })
@@ -105,7 +105,7 @@ router.post('/chatroom/:id/send', async (req, res) => {
     username: req.body.username,
     user_id: req.body.user_id,
     content: req.body.content,
-    timestamp: moment().format('MM/DD/YYYY [at] HH:MM a'),
+    timestamp: moment().format('MM/DD/YYYY [at] h:mm a'),
     id: mongoose.ObjectId,
     type: req.body.type
   }
