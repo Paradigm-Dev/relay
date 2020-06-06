@@ -6,6 +6,7 @@ const _path = require('path')
 const formidable = require('formidable')
 const fs = require('fs')
 const moment = require('moment')
+const Jimp = require('jimp')
 
 const UserModel = require('../models/User.js')
 const ChatroomModel = require('../models/Chatroom.js')
@@ -270,7 +271,13 @@ router.post('/:uid/pic', async (req, res) => {
     }
     
     file = files['files[0]']
-    await fs.renameSync(file.path, __dirname + '/../files/profile-pics/' + User._id + '.jpg')
+    await Jimp.read(file.path).then(img => {
+      return img
+        .resize(Jimp.AUTO, 150)
+        .quality(50)
+        .write(__dirname + '/../files/profile-pics/' + User._id + '.jpg')
+    }).catch(error => console.error(error))
+    // await fs.renameSync(file.path, __dirname + '/../files/profile-pics/' + User._id + '.jpg')
     User.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + User._id + '.jpg'
     res.json(User)
   })

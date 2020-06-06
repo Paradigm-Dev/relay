@@ -76,7 +76,7 @@ app.use('/rover', express.static(__dirname + '/rover'))
 app.use('/', express.static(__dirname + '/paradigm'))
 
 // CAMPAIGN
-app.use('/campaign', express.static(__dirname + '/campaign'))
+// app.use('/campaign', express.static(__dirname + '/campaign'))
 
 // RELAY
 app.use('/relay', express.static(__dirname + '/files'))
