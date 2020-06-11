@@ -168,7 +168,11 @@ router.get('/shortlist', async (req, res) => {
   var People = await UserModel.find({})
   var filtered = []
   People.forEach(person => {
-    filtered.push(person.username)
+    filtered.push({
+      _id: person._id,
+      username: person.username,
+      in: person.in
+    })
   })
   res.json(filtered)
 })
@@ -234,7 +238,7 @@ router.get('/:uid/chatroom/:id/:func', async (req, res) => {
 
 // Add/remove moonrocks
 router.get('/:uid/moonrocks/:diff', (req, res) => {
-  UserModel.findOneAndUpdate({ username: req.params.uid }, { $inc: { moonrocks: parseInt(req.params.diff) } }, (error, data) => {
+  UserModel.findOneAndUpdate({ _id: req.params.uid }, { $inc: { moonrocks: parseInt(req.params.diff) } }, (error, data) => {
     console.log(data)
     res.json(data)
   })
@@ -253,13 +257,13 @@ router.get('/:uid/drawer/list', (req, res) => {
 
 // Get profile pic
 router.get('/:uid/pic', async (req, res) => {
-  var User = await UserModel.findOne({ username: req.params.uid })
+  var User = await UserModel.findOne({ _id: req.params.uid })
   res.sendFile(_path.join(__dirname + '/../files/profile-pics/' + User._id + '.jpg'))
 })
 
 // Post profile pic
 router.post('/:uid/pic', async (req, res) => {
-  var User = await UserModel.findOne({ username: req.params.uid })
+  var User = await UserModel.findOne({ _id: req.params.uid })
   var file
 
   const form = formidable({ multiples: false, uploadDir: __dirname + '/../files/profile-pics/', keepExtensions: true })
@@ -284,7 +288,7 @@ router.post('/:uid/pic', async (req, res) => {
 })
 
 router.get('/:uid/delete', async (req, res) => {
-  var User = await UserModel.findOne({ username: req.params.uid })
+  var User = await UserModel.findOne({ _id: req.params.uid })
   async function deleteFolderRecursive(path) {
     fs.readdir(path, async (error, files) => {
       if (error) console.error(error)
@@ -303,7 +307,7 @@ router.get('/:uid/delete', async (req, res) => {
       fs.rmdir(path, async error => {
         fs.unlink(_path.join(__dirname + '/../files/profile-pics/' + User._id + '.jpg'), async error => {
           if (error) console.error(error)
-          var User = await UserModel.findOne({ username: req.params.uid })
+          var User = await UserModel.findOne({ _id: req.params.uid })
           User.people.approved.forEach(async person => {
             var Person = await UserModel.findOne({ _id: person._id })
             var Index = await Person.people.approved.findIndex(request => { return request._id == user._id })
@@ -322,7 +326,7 @@ router.get('/:uid/delete', async (req, res) => {
             await Person.people.approved.splice(Index, 1)
             await Person.save()
           })
-          await UserModel.findOneAndDelete({ username: req.params.uid })
+          await UserModel.findOneAndDelete({ _id: req.params.uid })
           res.end()
         })
       })
@@ -336,7 +340,7 @@ router.get('/:uid/delete', async (req, res) => {
 // -- Books
 router.get('/:uid/media/books/:id/get', async (req, res) => {
   var sending = {}
-  var user = await UserModel.findOne({ username: req.params.uid })
+  var user = await UserModel.findOne({ _id: req.params.uid })
   await BookModel.findById(req.params.id, async (error, data) => {
     if (error) console.error(error)
     else {
@@ -379,7 +383,7 @@ router.get('/:uid/media/books/:id/get', async (req, res) => {
               rating: null,
               favorite: false
             }
-            var user = await UserModel.findOne({ username: req.params.uid })
+            var user = await UserModel.findOne({ _id: req.params.uid })
             user.books.push(book)
             await user.save()
             res.json(sending)
@@ -401,7 +405,7 @@ router.get('/:uid/media/books/:id/add', async (req, res) => {
       }
     }
   })
-  var user = await UserModel.findOne({ username: req.params.uid })
+  var user = await UserModel.findOne({ _id: req.params.uid })
   user.books.push(book)
   user.save(() => {
     console.log(book)
@@ -410,7 +414,7 @@ router.get('/:uid/media/books/:id/add', async (req, res) => {
   })
 })
 router.post('/:uid/media/books/:id/update', async (req, res) => {
-  var user = await UserModel.findOne({ username: req.params.uid })
+  var user = await UserModel.findOne({ _id: req.params.uid })
 
   var subdocId
   user.books.forEach(async book => {
@@ -430,7 +434,7 @@ router.post('/:uid/media/books/:id/update', async (req, res) => {
 // -- Movies
 router.get('/:uid/media/movies/:id/get', async (req, res) => {
   var sending = {}
-  var user = await UserModel.findOne({ username: req.params.uid })
+  var user = await UserModel.findOne({ _id: req.params.uid })
   await MovieModel.findById(req.params.id, async (error, data) => {
     if (error) console.error(error)
     else {
@@ -475,7 +479,7 @@ router.get('/:uid/media/movies/:id/get', async (req, res) => {
               rating: null,
               favorite: false
             }
-            var user = await UserModel.findOne({ username: req.params.uid })
+            var user = await UserModel.findOne({ _id: req.params.uid })
             user.movies.push(movie)
             await user.save()
             res.json(sending)
@@ -497,7 +501,7 @@ router.get('/:uid/media/movies/:id/add', async (req, res) => {
       }
     }
   })
-  var user = await UserModel.findOne({ username: req.params.uid })
+  var user = await UserModel.findOne({ _id: req.params.uid })
   user.movies.push(movie)
   user.save(() => {
     console.log(movie)
@@ -506,7 +510,7 @@ router.get('/:uid/media/movies/:id/add', async (req, res) => {
   })
 })
 router.post('/:uid/media/movies/:id/update', async (req, res) => {
-  var user = await UserModel.findOne({ username: req.params.uid })
+  var user = await UserModel.findOne({ _id: req.params.uid })
 
   var subdocId
   user.movies.forEach(async movie => {
@@ -526,7 +530,7 @@ router.post('/:uid/media/movies/:id/update', async (req, res) => {
 // -- Music
 router.get('/:uid/media/music/:id/get', async (req, res) => {
   var sending = {}
-  var user = await UserModel.findOne({ username: req.params.uid })
+  var user = await UserModel.findOne({ _id: req.params.uid })
   await MusicModel.findById(req.params.id, async (error, data) => {
     if (error) console.error(error)
     else {
@@ -571,7 +575,7 @@ router.get('/:uid/media/music/:id/get', async (req, res) => {
               rating: null,
               favorite: false
             }
-            var user = await UserModel.findOne({ username: req.params.uid })
+            var user = await UserModel.findOne({ _id: req.params.uid })
             user.music.push(music)
             await user.save()
             res.json(sending)
@@ -593,7 +597,7 @@ router.get('/:uid/media/music/:id/add', async (req, res) => {
       }
     }
   })
-  var user = await UserModel.findOne({ username: req.params.uid })
+  var user = await UserModel.findOne({ _id: req.params.uid })
   user.music.push(music)
   user.save(() => {
     console.log(music)
@@ -602,7 +606,7 @@ router.get('/:uid/media/music/:id/add', async (req, res) => {
   })
 })
 router.post('/:uid/media/music/:id/update', async (req, res) => {
-  var user = await UserModel.findOne({ username: req.params.uid })
+  var user = await UserModel.findOne({ _id: req.params.uid })
 
   var subdocId
   user.music.forEach(async music => {
