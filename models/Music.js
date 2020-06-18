@@ -4,7 +4,8 @@ const SongSchema = new mongoose.Schema({
   title: String,
   file: String,
   length: String,
-  track: String
+  track: String,
+  lyrics: mongoose.Schema.Types.Mixed
 })
 
 const MusicSchema = new mongoose.Schema({

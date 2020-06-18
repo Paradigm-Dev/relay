@@ -11,7 +11,8 @@ const RouterConfigSchema = new mongoose.Schema({
   write: Boolean,
   people: Boolean,
   broadcast: Boolean,
-  transmission: Boolean
+  transmission: Boolean,
+  developer: Boolean
 })
 
 const ConfigSchema = new mongoose.Schema({

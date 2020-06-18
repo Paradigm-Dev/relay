@@ -171,7 +171,8 @@ router.get('/shortlist', async (req, res) => {
     filtered.push({
       _id: person._id,
       username: person.username,
-      in: person.in
+      in: person.in,
+      color: person.color
     })
   })
   res.json(filtered)
@@ -545,7 +546,6 @@ router.get('/:uid/media/music/:id/get', async (req, res) => {
           live: data.live,
           cover: data.cover,
           songs: data.songs,
-          summary: data.summary,
           title: data.title,
           rating: userMusic.rating,
           favorite: userMusic.favorite,
@@ -563,7 +563,6 @@ router.get('/:uid/media/music/:id/get', async (req, res) => {
               live: data.live,
               cover: data.cover,
               songs: data.songs,
-              summary: data.summary,
               title: data.title,
               rating: null,
               favorite: false,
