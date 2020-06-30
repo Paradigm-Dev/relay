@@ -6,10 +6,10 @@ NOW="$(date +'%d-%m-%Y_%H-%M')"
 # Settings:
 
 # Path to a temporary directory
-DIR=~/backup/
+DIR=~/relay/backup/
 
 # Name of the database
-DB_NAME=books
+DB_NAME=paradigm
 
 function mongodb_dump
 {
@@ -17,13 +17,13 @@ function mongodb_dump
   FILE="${DIR}${DB_NAME}_${NOW}.tar.gz"
 
   # Dump the database
-  mongodump -d $DB_NAME -o $DIR
+  mongodump --host=192.168.1.82 --port=27017 -d $DB_NAME -o $DIR
 
   # Compress
   tar -zcvf $FILE $DIR$DB_NAME
 
   # Remove the temporary database dump directory
-  rm -fr $DB_NAME
+  rm -fr $DIR$DB_NAME
 }
 
 mongodb_dump
