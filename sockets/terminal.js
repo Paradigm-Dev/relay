@@ -5,7 +5,7 @@ const UserModel = require('./../models/User.js')
 
 module.exports = io => {
   var terminal = io.of('/terminal').on('connection', async socket => {
-    var log = fs.readFileSync(__dirname + '/../log.txt')
+    var log = fs.readFileSync(__dirname + '/../relay.log')
     socket.emit('log', log)
 
     socket.on('config', async data => {

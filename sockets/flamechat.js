@@ -1,5 +1,5 @@
-const ChatroomModel = require('./../models/Chatroom.js')
-const DMModel = require('./../models/DM.js')
+const ChatroomModel = require('../models/Chatroom.js')
+const DMModel = require('../models/DM.js')
 const mongoose = require('mongoose')
 const fs = require('fs')
 
