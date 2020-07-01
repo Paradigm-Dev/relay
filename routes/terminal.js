@@ -9,22 +9,25 @@ const MusicModel = require('./../models/Music.js')
 
 router.get('/user/:username/view', async (req, res) => {
   var User = await UserModel.findOne({ username: req.params.username })
-  var user = {
-    username: User.username,
-    color: User.color,
-    _id: User._id,
-    bio: User.bio,
-    moonrocks: User.moonrocks,
-    rights: {
-      admin: User.rights.admin,
-      author: User.rights.author,
-      asteroid: User.rights.asteroid
-    },
-    banned: User.banned,
-    strikes: User.strikes,
-    in: User.in
-  }
-  res.json(user)
+  if (User) {
+    var user = {
+      username: User.username,
+      color: User.color,
+      _id: User._id,
+      bio: User.bio,
+      moonrocks: User.moonrocks,
+      rights: {
+        admin: User.rights.admin,
+        author: User.rights.author,
+        asteroid: User.rights.asteroid,
+        developer: User.rights.developer
+      },
+      banned: User.banned,
+      strikes: User.strikes,
+      in: User.in
+    }
+    res.json(user)
+  } else res.json({ error: `user ${req.params.username} not found` })
 })
 
 router.get('/user/:username/strike', async (req, res) => {

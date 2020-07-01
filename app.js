@@ -49,7 +49,8 @@ app.use(cors({
     'https://theparadigmdev.com',
     'https://liddy.cf',
     'https://www.liddy.cf',
-    'https://localhost:8080'
+    'https://localhost:8080',
+    'https://192.168.1.82:8081'
   ]
 }))
 
