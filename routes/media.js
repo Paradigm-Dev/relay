@@ -173,7 +173,7 @@ router.post('/create/:id/files/:type', async (req, res) => {
     await Jimp.read(files.cover.path).then(img => {
       return img.write(__dirname + `/../files/${req.params.type == 'music' ? 'music' : req.params.type + 's'}/img/${Item._id}.jpg`)
     }).catch(error => console.error(error))
-    await fs.renameSync(files.file.path, __dirname + `/../files/${req.params.type == 'music' ? 'music' : req.params.type + 's'}/${Item._id}.${files.file.name.slice(files.file.name.lastIndexOf('.'))}`)
+    await fs.renameSync(files.file.path, __dirname + `/../files/${req.params.type == 'music' ? 'music' : req.params.type + 's'}/${Item._id}.${files.file.name.slice(files.file.name.lastIndexOf('.') + 1)}`)
     res.json(Item)
   })
 })
