@@ -2,7 +2,7 @@ import { Router } from 'https://deno.land/x/oak/mod.ts'
 const router = new Router()
 
 import db from '../db.ts'
-import News from '../interfaces/News.interface.ts'
+import { News } from '../interfaces/News.interface.ts'
 const news = db.collection<News>('news')
 
 import parseBody from '../helpers/parseBody.ts'

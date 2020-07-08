@@ -26,6 +26,7 @@ interface StoredChatroom {
 }
 
 interface DrawerFile {
+  _id: ObjectId
   name: string
   type: string
   size: string
@@ -51,11 +52,11 @@ interface Post {
 }
 
 interface People {
-  requests: [Person]
-  approved: [Person]
-  blocked: [Person]
-  sent: [Person]
-  blocked_by: [Person]
+  requests: Person[]
+  approved: Person[]
+  blocked: Person[]
+  sent: Person[]
+  blocked_by: Person[]
 }
 
 interface Rights {
@@ -74,18 +75,18 @@ interface User {
   bio: string
   color: string
   pic: string
-  chatrooms: [StoredChatroom]
+  chatrooms: StoredChatroom[]
   people: People
   rights: Rights
   moonrocks: number
-  books: [UserBook]
-  movies: [UserMovie]
-  music: [UserMusic]
-  files: [DrawerFile]
+  books: UserBook[]
+  movies: UserMovie[]
+  music: UserMusic[]
+  files: DrawerFile[]
   banned: boolean
   strikes: number
   in: boolean
-  posts: [Post]
+  posts: Post[]
 }
 
 export {

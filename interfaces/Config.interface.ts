@@ -1,3 +1,5 @@
+import { ObjectId } from 'https://deno.land/x/mongo/mod.ts'
+
 interface Router {
   flamechat: boolean
   satellite: boolean
@@ -12,8 +14,8 @@ interface Router {
   developer: boolean
 }
 
-export default interface Config {
-  _id: { $oid: string }
+interface Config {
+  _id: ObjectId
   sign_up: boolean
   migrate: boolean
   reset: boolean
@@ -21,4 +23,9 @@ export default interface Config {
   router: Router
   find: 'this'
   banned: [string]
+}
+
+export {
+  Router,
+  Config
 }

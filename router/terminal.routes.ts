@@ -4,10 +4,10 @@ const router = new Router()
 import db from '../db.ts'
 import { User } from '../interfaces/User.interface.ts'
 import { Chatroom } from '../interfaces/Chatroom.interface.ts'
-import DM from '../interfaces/DM.interface.ts'
-import Book from '../interfaces/Book.interface.ts'
-import Movie from '../interfaces/Movie.interface.ts'
-import Music from '../interfaces/Music.interface.ts'
+import { DM } from '../interfaces/DM.interface.ts'
+import { Book } from '../interfaces/Book.interface.ts'
+import { Movie } from '../interfaces/Movie.interface.ts'
+import { Music } from '../interfaces/Music.interface.ts'
 const users = db.collection<User>('users')
 const chatrooms = db.collection<Chatroom>('chatrooms')
 const dms = db.collection<DM>('dms')

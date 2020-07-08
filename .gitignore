@@ -3,5 +3,5 @@
 /.vscode
 /drawer
 .DS_STORE
-/temp
 /temp_uploads
+/files

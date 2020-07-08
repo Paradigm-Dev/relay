@@ -1,7 +1,9 @@
+import { ObjectId } from 'https://deno.land/x/mongo/mod.ts'
+
 type MessageType = 'message' | 'left' | 'join' | 'file'
 
 interface Message {
-  _id: { $oid: string }
+  _id: ObjectId
   color: string
   username: string
   user_id: string
@@ -20,8 +22,15 @@ interface Person {
   pic: string
 }
 
-export default interface DM {
-  _id: { $oid: string }
-  messages: [Message]
-  people: [Person]
+interface DM {
+  _id: ObjectId
+  messages: Message[]
+  people: Person[]
+}
+
+export {
+  MessageType,
+  Message,
+  Person,
+  DM
 }

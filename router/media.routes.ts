@@ -2,9 +2,9 @@ import { Router } from 'https://deno.land/x/oak/mod.ts'
 const router = new Router()
 
 import db from '../db.ts'
-import Book from '../interfaces/Book.interface.ts'
-import Movie from '../interfaces/Movie.interface.ts'
-import Music from '../interfaces/Music.interface.ts'
+import { Book } from '../interfaces/Book.interface.ts'
+import { Movie } from '../interfaces/Movie.interface.ts'
+import { Music } from '../interfaces/Music.interface.ts'
 const books = db.collection<Book>('books')
 const movies = db.collection<Movie>('movies')
 const music = db.collection<Music>('musics')

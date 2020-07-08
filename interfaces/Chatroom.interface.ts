@@ -1,7 +1,9 @@
+import { ObjectId } from 'https://deno.land/x/mongo/mod.ts'
+
 type MessageType = 'message' | 'left' | 'join' | 'file'
 
 interface Message {
-  _id: { $oid: string }
+  _id: ObjectId
   color: string
   username: string
   user_id: string
@@ -21,18 +23,27 @@ interface Person {
 }
 
 interface People {
-  approved: [Person]
-  requested: [Person]
-  banned: [Person]
+  approved: Person[]
+  requested: Person[]
+  banned: Person[]
 }
 
-export default interface Chatroom {
-  _id: { $oid: string }
-  messages: [Message]
+interface Chatroom {
+  _id: ObjectId
+  messages: Message[]
   icon: string
   id: string
   name: string
   owner: string
+  owner_id: string
   theme: string
   people: People
+}
+
+export {
+  MessageType,
+  Message,
+  Person,
+  People,
+  Chatroom
 }
