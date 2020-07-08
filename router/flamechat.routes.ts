@@ -148,7 +148,7 @@ router.delete('/api/:uid/flamechat/chatroom/:id/ban/:user', async context => {
   await chatrooms.updateOne({ id: context.params.id }, { $pull: { 'people.banned': userData } })
 })
 
-router.delete('/api/:uid/flamechat/chatroom/:id/unban/:user', async context => {
+router.get('/api/:uid/flamechat/chatroom/:id/unban/:user', async context => {
   await chatrooms.updateOne({ id: context.params.id }, { $pull: { 'people.banned': { _id: context.params.user } } })
 })
 
