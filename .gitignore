@@ -1,3 +1,7 @@
 /paradigm
 /.deno_plugins
 /.vscode
+/drawer
+.DS_STORE
+/temp
+/temp_uploads
