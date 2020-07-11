@@ -49,8 +49,8 @@ app.use(router.terminal.allowedMethods())
 app.use(router.transmission.routes())
 app.use(router.transmission.allowedMethods())
 
-app.use(router.users.routes())
-app.use(router.users.allowedMethods())
+app.use(router.user.routes())
+app.use(router.user.allowedMethods())
 
 app.use(async context => {
   await send(context, context.request.url.pathname, {

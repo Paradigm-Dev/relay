@@ -18,7 +18,7 @@ router.post('/api/auth/signup', async context => {
   const password = await hash(body.password, salt)
 
   const _id = generateObjectId()
-  let user: User = {
+  const user: User = {
     _id,
     username: body.username,
     password,
@@ -55,10 +55,8 @@ router.post('/api/auth/signup', async context => {
 
   await users.insertOne(user)
 
-  user = await users.findOne({ _id: { $oid: _id } })
-
   context.response.type = 'application/json'
-  context.response.body = user
+  context.response.body = await users.findOne({ _id: { $oid: _id } })
 })
 
 router.post('/api/auth/signin', async context => {
@@ -107,6 +105,18 @@ router.post('/api/:uid/auth/reset', async context => {
     context.response.type = 'application/json'
     context.response.body = { error: 'Current password is incorrect' }
   }
+})
+
+router.get('/api/auth/check/:username', async context => {
+  const user = await users.findOne({ _id: { $oid: context.params.uid } })
+
+  let data = {
+    exists: user ? true : false,
+    in: user.in
+  }
+
+  context.response.type = 'application/json'
+  context.response.body = data
 })
 
 export default router

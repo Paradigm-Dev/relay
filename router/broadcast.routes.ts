@@ -1,3 +1,4 @@
+// @deno-types='https://deno.land/x/oak/types.d.ts'
 import { Router } from 'https://deno.land/x/oak/mod.ts'
 const router = new Router()
 
@@ -22,15 +23,15 @@ router.post('/api/:uid/broadcast', async context => {
   }
 
   await users.updateOne({ _id: { $oid: context.params.uid } }, { $push: { posts: { $each: [ newPost ], $position: 0 } } })
-  const user = await users.findOne({ _id: { $oid: context.params.uid } })
-  context.response.body = user
+
+  context.response.body = await users.findOne({ _id: { $oid: context.params.uid } })
   context.response.type = 'application/json'
 })
 
 router.delete('/api/:uid/broadcast/:id', async context => {
   await users.updateOne({ _id: { $oid: context.params.uid } }, { $pull: { posts: { _id: { $oid: context.params.id } } } })
-  const user = await users.findOne({ _id: { $oid: context.params.uid } })
-  context.response.body = user
+
+  context.response.body = await users.findOne({ _id: { $oid: context.params.uid } })
   context.response.type = 'application/json'
 })
 
@@ -38,9 +39,10 @@ router.get('/api/:uid/broadcast/like/:profile/:post', async context => {
   await users.updateOne({ _id: context.params.uid, 'people.approved._id': context.params.profile }, { $push: { 'people.approved.$.liked_posts': context.params.post } })
   await users.updateOne({ _id: context.params.profile, 'posts._id': context.params.post }, { $inc: { 'posts.$.likes': 1 } })
 
-  const user = await users.findOne({ _id: { $oid: context.params.uid } })
-  const profile = await users.findOne({ _id: { $oid: context.params.profile } })
-  context.response.body = { user, profile }
+  context.response.body = {
+    user: await users.findOne({ _id: { $oid: context.params.uid } }),
+    profile: await users.findOne({ _id: { $oid: context.params.profile } })
+  }
   context.response.type = 'application/json'
 })
 
@@ -48,9 +50,10 @@ router.get('/api/:uid/broadcast/unlike/:profile/:post', async context => {
   await users.updateOne({ _id: context.params.uid, 'people.approved._id': context.params.profile }, { $pull: { 'people.approved.$.liked_posts': context.params.post } })
   await users.updateOne({ _id: context.params.profile, 'posts._id': context.params.post }, { $inc: { 'posts.$.likes': -1 } })
 
-  const user = await users.findOne({ _id: { $oid: context.params.uid } })
-  const profile = await users.findOne({ _id: { $oid: context.params.profile } })
-  context.response.body = { user, profile }
+  context.response.body = {
+    user: await users.findOne({ _id: { $oid: context.params.uid } }),
+    profile: await users.findOne({ _id: { $oid: context.params.profile } })
+  }
   context.response.type = 'application/json'
 })
 

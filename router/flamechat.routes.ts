@@ -1,3 +1,4 @@
+// @deno-types='https://deno.land/x/oak/types.d.ts'
 import { Router } from 'https://deno.land/x/oak/mod.ts'
 const router = new Router()
 
@@ -52,8 +53,7 @@ router.post('/api/:uid/flamechat/chatroom', async context => {
     await users.updateOne({ _id: { $oid: context.params.uid } }, { $push: { chatrooms: storedChatroom } })
     await Deno.mkdir(`${Deno.cwd()}/files/flamechat/chatroom/${body.id}`)
     
-    user = await users.findOne({ _id: { $oid: context.params.uid } })
-    context.response.body = user
+    context.response.body = await users.findOne({ _id: { $oid: context.params.uid } })
     context.response.type = 'application/json'
   }
 })
@@ -97,8 +97,7 @@ router.get('/api/:uid/flamechat/chatroom/:id/request', async context => {
     await chatrooms.updateOne({ id: context.params.id }, { $push: { 'people.requested': userData } })
     await users.updateOne({ _id: { $oid: context.params.uid } }, { $push: { chatrooms: chatroomData } })
 
-    user = await users.findOne({ _id: { $oid: context.params.uid } })
-    context.response.body = user
+    context.response.body = await users.findOne({ _id: { $oid: context.params.uid } })
     context.response.type = 'application/json'  
   } else {
     context.response.body = { error: 'banned' }

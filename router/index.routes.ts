@@ -12,7 +12,7 @@ import paradox from './paradox.routes.ts'
 import people from './people.routes.ts'
 import terminal from './terminal.routes.ts'
 import transmission from './transmission.routes.ts'
-import users from './users.routes.ts'
+import user from './user.routes.ts'
 
 // router.get('/', async context => {
   
@@ -29,5 +29,5 @@ export default {
   people,
   terminal,
   transmission,
-  users
+  user
 }

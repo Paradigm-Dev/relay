@@ -1,10 +1,13 @@
+// @deno-types='https://deno.land/x/oak/types.d.ts'
 import { Router } from 'https://deno.land/x/oak/mod.ts'
 const router = new Router()
 
 import db from '../db.ts'
+import { User } from '../interfaces/User.interface.ts'
 import { Book } from '../interfaces/Book.interface.ts'
 import { Movie } from '../interfaces/Movie.interface.ts'
 import { Music } from '../interfaces/Music.interface.ts'
+const users = db.collection<User>('users')
 const books = db.collection<Book>('books')
 const movies = db.collection<Movie>('movies')
 const music = db.collection<Music>('musics')
@@ -20,15 +23,57 @@ router.get('/api/:uid/media/books', async context => {
   context.response.type = 'application/json'
 })
 
+router.post('/api/:uid/media/books/:id', async context => {
+  const body = await parseBody(context)
+
+  const saving = {
+    book_id: context.params.id,
+    rating: body.rating,
+    favorite: body.favorite
+  }
+  await users.updateOne({ _id: { $oid: context.params.uid } }, { $push: { books: saving } })
+
+  context.response.body = await users.findOne({ _id: { $oid: context.params.uid } })
+  context.response.type = 'application/json'
+})
+
 router.get('/api/:uid/media/movies', async context => {
   const moviesList = await movies.find({})
   context.response.body = moviesList
   context.response.type = 'application/json'
 })
 
+router.post('/api/:uid/media/movies/:id', async context => {
+  const body = await parseBody(context)
+
+  const saving = {
+    movie_id: context.params.id,
+    rating: body.rating,
+    favorite: body.favorite
+  }
+  await users.updateOne({ _id: { $oid: context.params.uid } }, { $push: { movies: saving } })
+
+  context.response.body = await users.findOne({ _id: { $oid: context.params.uid } })
+  context.response.type = 'application/json'
+})
+
 router.get('/api/:uid/media/music', async context => {
   const musicList = await music.find({})
   context.response.body = musicList
+  context.response.type = 'application/json'
+})
+
+router.post('/api/:uid/media/music/:id', async context => {
+  const body = await parseBody(context)
+
+  const saving = {
+    music_id: context.params.id,
+    rating: body.rating,
+    favorite: body.favorite
+  }
+  await users.updateOne({ _id: { $oid: context.params.uid } }, { $push: { music: saving } })
+
+  context.response.body = await users.findOne({ _id: { $oid: context.params.uid } })
   context.response.type = 'application/json'
 })
 

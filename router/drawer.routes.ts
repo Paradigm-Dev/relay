@@ -1,3 +1,4 @@
+// @deno-types='https://deno.land/x/oak/types.d.ts'
 import { Router } from 'https://deno.land/x/oak/mod.ts'
 const router = new Router()
 
@@ -34,8 +35,7 @@ router.post('/api/:uid/drawer/rename/:id', async context => {
   await users.updateOne({ _id: { $oid: context.params.uid }, 'files._id': { $oid: context.params.id } }, { 'files.$.path': newPath })
   await users.updateOne({ _id: { $oid: context.params.uid }, 'files._id': { $oid: context.params.id } }, { 'files.$.name': body.name })
 
-  const userData = await users.findOne({ _id: { $oid: context.params.uid } })
-  context.response.body = userData
+  context.response.body = await users.findOne({ _id: { $oid: context.params.uid } })
   context.response.type = 'application/json'
 })
 
@@ -46,8 +46,7 @@ router.delete('/api/:uid/drawer/delete/:id', async context => {
   await Deno.remove(`${Deno.cwd()}/drawer/${user._id.$oid}/${file[0].path}`)
   await users.updateOne({ _id: { $oid: context.params.uid }, 'files._id': { $oid: context.params.id } }, { files: { $pull: '$' } })
 
-  const userData = await users.findOne({ _id: { $oid: context.params.uid } })
-  context.response.body = userData
+  context.response.body = await users.findOne({ _id: { $oid: context.params.uid } })
   context.response.type = 'application/json'
 })
 
