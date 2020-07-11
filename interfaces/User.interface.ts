@@ -39,7 +39,7 @@ interface Person {
   username: string
   color: string
   pic: string
-  liked_posts: [string]
+  liked_posts: string[]
   dm: string
 }
 
@@ -74,7 +74,6 @@ interface User {
   password: string
   bio: string
   color: string
-  pic: string
   chatrooms: StoredChatroom[]
   people: People
   rights: Rights

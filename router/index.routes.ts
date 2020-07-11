@@ -3,11 +3,13 @@ const router = new Router()
 
 import db from '../db.ts'
 
+import authentication from './authentication.routes.ts'
 import broadcast from './broadcast.routes.ts'
 import drawer from './drawer.routes.ts'
 import flamechat from './flamechat.routes.ts'
 import media from './media.routes.ts'
 import paradox from './paradox.routes.ts'
+import people from './people.routes.ts'
 import terminal from './terminal.routes.ts'
 import transmission from './transmission.routes.ts'
 import users from './users.routes.ts'
@@ -18,11 +20,13 @@ import users from './users.routes.ts'
 
 export default {
   index: router,
+  authentication,
   broadcast,
   drawer,
   flamechat,
   media,
   paradox,
+  people,
   terminal,
   transmission,
   users

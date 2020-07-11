@@ -17,42 +17,45 @@ router.post('/api/:uid/flamechat/chatroom', async context => {
   let user = await users.findOne({ _id: { $oid: context.params.uid } })
 
   const _id = generateObjectId()
-  const newChatroom: Chatroom = {
-    _id,
-    icon: body.icon,
-    id: body.id,
-    name: body.name,
-    owner: body.owner,
-    owner_id: body.owner_id,
-    theme: body.theme,
-    messages: [],
-    people: {
-      approved: [
-        {
-          _id: user._id.$oid,
-          username: user.username,
-          color: user.color,
-          pic: `https://www.theparadigmdev.com/relay/profile-pics/${user._id.$oid}.jpg`
-        }
-      ],
-      requested: [],
-      banned: []
-    }
-  }
-  const chatroom = await chatrooms.insertOne(newChatroom)
+  if (context.params.uid) {
 
-  const storedChatroom: StoredChatroom = {
-    name: chatroom.name,
-    id: chatroom.id,
-    icon: chatroom.icon,
-    status: 'approved'
-  }
-  await users.updateOne({ _id: { $oid: context.params.uid } }, { $push: { chatrooms: storedChatroom } })
-  await Deno.mkdir(`${Deno.cwd()}/files/flamechat/chatroom/${body.id}`)
+    const newChatroom: Chatroom = {
+      _id,
+      icon: body.icon,
+      id: body.id,
+      name: body.name,
+      owner: body.owner,
+      owner_id: context.params.uid,
+      theme: body.theme,
+      messages: [],
+      people: {
+        approved: [
+          {
+            _id: user._id.$oid,
+            username: user.username,
+            color: user.color,
+            pic: `https://www.theparadigmdev.com/relay/profile-pics/${user._id.$oid}.jpg`
+          }
+        ],
+        requested: [],
+        banned: []
+      }
+    }
+    const chatroom = await chatrooms.insertOne(newChatroom)
   
-  user = await users.findOne({ _id: { $oid: context.params.uid } })
-  context.response.body = user
-  context.response.type = 'application/json'
+    const storedChatroom: StoredChatroom = {
+      name: chatroom.name,
+      id: chatroom.id,
+      icon: chatroom.icon,
+      status: 'approved'
+    }
+    await users.updateOne({ _id: { $oid: context.params.uid } }, { $push: { chatrooms: storedChatroom } })
+    await Deno.mkdir(`${Deno.cwd()}/files/flamechat/chatroom/${body.id}`)
+    
+    user = await users.findOne({ _id: { $oid: context.params.uid } })
+    context.response.body = user
+    context.response.type = 'application/json'
+  }
 })
 
 router.post('/api/:uid/flamechat/chatroom/:id/file', upload('/temp'), async context => {

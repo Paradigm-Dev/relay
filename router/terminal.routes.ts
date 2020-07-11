@@ -28,7 +28,8 @@ router.get('/api/:uid/terminal/user/:username/view', async context => {
         admin: user.rights.admin,
         author: user.rights.author,
         asteroid: user.rights.asteroid,
-        developer: user.rights.developer
+        developer: user.rights.developer,
+        apollo: user.rights.apollo,
       },
       banned: user.banned,
       strikes: user.strikes,
@@ -54,7 +55,6 @@ router.delete('/api/:uid/terminal/user/:username/delete', async context => {
   await chatrooms.updateMany({ 'people.banned.username': context.params.username }, { $pull: { 'people.banned': { username: context.params.username } } })
 
   await Deno.remove(`${Deno.cwd()}/drawer/${user._id.$oid}`, { recursive: true })
-
   await users.updateMany({ 'people.requests.username': context.params.username }, { $pull: { 'people.requests': { username: context.params.username } } })
   await users.updateMany({ 'people.approved.username': context.params.username }, { $pull: { 'people.approved': { username: context.params.username } } })
   await users.updateMany({ 'people.blocked.username': context.params.username }, { $pull: { 'people.blocked': { username: context.params.username } } })
