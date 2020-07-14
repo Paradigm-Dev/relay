@@ -10,7 +10,7 @@ const users = db.collection<User>('users')
 const chatrooms = db.collection<Chatroom>('chatrooms')
 const dms = db.collection<DM>('dms')
 
-import parseBody from '../helpers/parseBody.ts'
+import parseBody from '../helpers/parseBody.helpers.ts'
 
 import { upload } from 'https://deno.land/x/upload_middleware_for_oak_framework/mod.ts'
 

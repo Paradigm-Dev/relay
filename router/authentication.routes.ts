@@ -8,8 +8,8 @@ const users = db.collection<User>('users')
 
 import { genSalt, hash, compare } from 'https://deno.land/x/bcrypt/mod.ts'
 
-import parseBody from '../helpers/parseBody.ts'
-import generateObjectId from '../helpers/generateObjectId.ts'
+import parseBody from '../helpers/parseBody.helpers.ts'
+import generateObjectId from '../helpers/generateObjectId.helpers.ts'
 
 router.post('/api/auth/signup', async context => {
   const body = await parseBody(context)

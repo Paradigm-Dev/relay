@@ -6,8 +6,8 @@ import db from '../db.ts'
 import { News } from '../interfaces/News.interface.ts'
 const news = db.collection<News>('news')
 
-import parseBody from '../helpers/parseBody.ts'
-import generateObjectId from '../helpers/generateObjectId.ts'
+import parseBody from '../helpers/parseBody.helpers.ts'
+import generateObjectId from '../helpers/generateObjectId.helpers.ts'
 
 router.get('/api/:uid/paradox', async context => {
   const allNews = await news.find({})

@@ -9,6 +9,7 @@ import {
   yellow,
   red,
 } from 'https://deno.land/std@0.58.0/fmt/colors.ts'
+import { middleware as wsMiddleware } from './middleware/ws.middleware.ts'
 
 
 // APPLICATION
@@ -23,6 +24,11 @@ import db from './db.ts'
 // ROUTER
 console.log('\x1b[32m[ ROUTER ]', `\x1b[31m${moment().format('MM/DD/YYYY, HH:MM:SS')}`, '\x1b[0mmapping routes')
 import router from './router/index.routes.ts'
+import ws from './sockets/index.sockets.ts'
+
+app.use(ws.flamechat.routes())
+app.use(ws.flamechat.allowedMethods())
+
 
 
 app.use(router.index.routes())
@@ -70,6 +76,9 @@ app.use(async (context, next) => {
     next()
   } else next()
 })
+
+
+app.use(wsMiddleware)
 
 
 // ERROR HANDLING

@@ -6,8 +6,8 @@ import db from '../db.ts'
 import { User, Post } from '../interfaces/User.interface.ts'
 const users = db.collection<User>('users')
 
-import parseBody from '../helpers/parseBody.ts'
-import generateObjectId from '../helpers/generateObjectId.ts'
+import parseBody from '../helpers/parseBody.helpers.ts'
+import generateObjectId from '../helpers/generateObjectId.helpers.ts'
 
 router.post('/api/:uid/broadcast', async context => {
   const body = await parseBody(context)

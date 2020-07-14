@@ -6,8 +6,8 @@ import db from '../db.ts'
 import { User, DrawerFile } from '../interfaces/User.interface.ts'
 const users = db.collection<User>('users')
 
-import parseBody from '../helpers/parseBody.ts'
-import generateObjectId from '../helpers/generateObjectId.ts'
+import parseBody from '../helpers/parseBody.helpers.ts'
+import generateObjectId from '../helpers/generateObjectId.helpers.ts'
 
 import { upload } from 'https://deno.land/x/upload_middleware_for_oak_framework/mod.ts'
 import { moment } from 'https://deno.land/x/moment/moment.ts'

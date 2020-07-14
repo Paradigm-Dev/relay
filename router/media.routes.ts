@@ -12,8 +12,8 @@ const books = db.collection<Book>('books')
 const movies = db.collection<Movie>('movies')
 const music = db.collection<Music>('musics')
 
-import parseBody from '../helpers/parseBody.ts'
-import generateObjectId from '../helpers/generateObjectId.ts'
+import parseBody from '../helpers/parseBody.helpers.ts'
+import generateObjectId from '../helpers/generateObjectId.helpers.ts'
 
 import { upload } from 'https://deno.land/x/upload_middleware_for_oak_framework/mod.ts'
 
