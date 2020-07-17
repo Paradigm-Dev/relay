@@ -7,12 +7,6 @@ const moment = require('moment')
 
 const UserModel = require('../models/User.js')
 
-router.get('/:uid/list', (req, res) => {
-  UserModel.findOne({ _id: req.params.uid }, (error, data) => {
-    if (!error) res.json(data.files)
-  })
-})
-
 router.get('/:uid/download/:id', async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid })
   var File = await User.files.id(req.params.id)
