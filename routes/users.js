@@ -31,7 +31,7 @@ router.post('/register', (req, res) => {
         created: moment().format('dddd, MMMM Do YYYY [at] h:mm a')
       })
 
-      fs.mkdirSync(__dirname + '/../drawer/' + newUser._id)
+      fs.mkdirSync('/mnt/drawer/' + newUser._id)
 
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -246,14 +246,17 @@ router.get('/:uid/moonrocks/:diff', (req, res) => {
 })
 
 // Get list of files in Drawer
-router.get('/:uid/drawer/list', (req, res) => {
-  UserModel.findOne({ _id: req.params.uid }, (error, data) => {
-    if (!error) res.json(data.files)
-    else {
-      console.error(error)
-      res.end()
-    }
-  })
+router.get('/:uid/drawer/list', async(req, res) => {
+  var user = await UserModel.findOne({ _id: req.params.uid })
+
+  for await (var file of user.files) {
+    fs.stat(_path.join('/mnt/drawer/', req.params.uid, '/', file.path), (error, stats) => {
+      file.size = stats.size + ' B'
+    })
+  }
+  await user.save()
+
+  res.json(user.files)
 })
 
 // Get profile pic
@@ -333,7 +336,7 @@ router.get('/:uid/delete', async (req, res) => {
       })
     })
   }
-  deleteFolderRecursive(__dirname + '/../drawer/' + User._id)
+  deleteFolderRecursive('/mnt/drawer/' + User._id)
 })
 
 
