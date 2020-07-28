@@ -45,7 +45,7 @@ router.post('/chatroom/new', (req, res) => {
           pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`
         })
         await User.save()
-        await fs.mkdirSync(__dirname + `/../flamechat/chatroom/${data.id}`)
+        await fs.mkdirSync(__dirname + `/../files/flamechat/chatroom/${data.id}`)
         res.json(data)
       }
     })
@@ -108,7 +108,7 @@ router.get('/chatroom/:id/delete', async (req, res) => {
       })
     })
   }
-  deleteFolderRecursive(__dirname + '/../flamechat/' + Chatroom._id)
+  deleteFolderRecursive(__dirname + '/../files/flamechat/' + Chatroom._id)
 })
 
 router.get('/chatroom/:id/remove/:user', async (req, res) => {
