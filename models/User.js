@@ -79,7 +79,11 @@ const UserSchema = new mongoose.Schema({
   strikes: Number,
   in: Boolean,
   created: String,
-  posts: [PostSchema]
+  posts: [PostSchema],
+  apollo_codes: {
+    created: Number,
+    quota: Number
+  }
 })
 
 const UserModel = mongoose.model('user', UserSchema)

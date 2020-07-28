@@ -9,6 +9,7 @@ const moment = require('moment')
 const Jimp = require('jimp')
 
 const UserModel = require('../models/User.js')
+const ApolloModel = require('../models/Apollo.js')
 const ChatroomModel = require('../models/Chatroom.js')
 const DMModel = require('../models/DM.js')
 const BookModel = require('../models/Book.js')
@@ -30,6 +31,8 @@ router.post('/register', (req, res) => {
         moonrocks: req.body.moonrocks,
         created: moment().format('dddd, MMMM Do YYYY [at] h:mm a')
       })
+
+      ApolloModel.findOneAndUpdate({ code: req.body.code }, { $set: { used: true, username: user.username, uid: user._id } })
 
       fs.mkdirSync(__dirname + '/../drawer/' + newUser._id)
 

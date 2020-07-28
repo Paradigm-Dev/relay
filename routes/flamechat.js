@@ -12,10 +12,17 @@ const UserModel = require('../models/User.js')
 
 // New chatroom
 router.post('/chatroom/new', (req, res) => {
+  let id = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let charactersLength = characters.length
+  for (let i = 0; i < 8; i++) {
+    id += characters.charAt(Math.floor(Math.random() * charactersLength))
+  }
+
   ChatroomModel.create({
     _id: mongoose.Types.ObjectId(),
     icon: req.body.icon,
-    id: req.body.id,
+    id,
     name: req.body.name,
     owner: req.body.owner,
     owner_id: req.body.owner_id,
