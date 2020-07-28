@@ -11,17 +11,6 @@ const MovieModel = require('../models/Movie.js')
 const MusicModel = require('../models/Music.js')
 
 // Books
-router.post('/books/create', (req, res) => {
-  BookModel.create({
-    author: req.body.author,
-    live: req.body.live,
-    cover: req.body.cover,
-    link: req.body.link,
-    summary: req.body.summary,
-    title: req.body.title
-  })
-  res.json(req.body)
-})
 router.get('/books/get', (req, res) => {
   BookModel.find({} , (error, data) => {
     if (error) console.error(error)
@@ -34,12 +23,6 @@ router.get('/books/get', (req, res) => {
     }
   })
 })
-router.get('/books/read/:title', (req, res) => {
-  BookModel.findOne({ title: req.params.title }, (error, data) => {
-    if (error) console.error(error)
-    else res.json(data)
-  })
-})
 router.get('/books/download/:title', (req, res) => {
   BookModel.findOne({ title: req.params.title }, (error, data) => {
     if (error) console.error(error)
@@ -49,17 +32,6 @@ router.get('/books/download/:title', (req, res) => {
 
 
 // Movies
-router.post('/movies/create', (req, res) => {
-  MovieModel.create({
-    genre: req.body.genre,
-    live: req.body.live,
-    cover: req.body.cover,
-    link: req.body.link,
-    summary: req.body.summary,
-    title: req.body.title
-  })
-  res.json(req.body)
-})
 router.get('/movies/get', (req, res) => {
   MovieModel.find({} , (error, data) => {
     if (error) console.error(error)
@@ -72,12 +44,6 @@ router.get('/movies/get', (req, res) => {
     }
   })
 })
-router.get('/movies/read/:title', (req, res) => {
-  MovieModel.findOne({ title: req.params.title }, (error, data) => {
-    if (error) console.error(error)
-    else res.json(data)
-  })
-})
 router.get('/movies/download/:title', (req, res) => {
   MovieModel.findOne({ title: req.params.title }, (error, data) => {
     if (error) console.error(error)
@@ -87,17 +53,6 @@ router.get('/movies/download/:title', (req, res) => {
 
 
 // -- Music
-router.post('/music/create', (req, res) => {
-  MusicModel.create({
-    artist: req.body.artist,
-    live: req.body.live,
-    cover: req.body.cover,
-    title: req.body.title,
-    songs: req.body.songs,
-    genre: req.body.genre
-  })
-  res.json(req.body)
-})
 router.get('/music/get', (req, res) => {
   MusicModel.find({} , (error, data) => {
     if (error) console.error(error)
@@ -108,12 +63,6 @@ router.get('/music/get', (req, res) => {
       })
       res.json(music)
     }
-  })
-})
-router.get('/music/read/:title', (req, res) => {
-  MusicModel.findOne({ title: req.params.title }, (error, data) => {
-    if (error) console.error(error)
-    else res.json(data)
   })
 })
 
@@ -166,9 +115,6 @@ router.post('/create/:id/files/:type', async (req, res) => {
       next(err)
       return
     }
-
-    console.log(files)
-    console.log(Item)
 
     await Jimp.read(files.cover.path).then(img => {
       return img.write(__dirname + `/../files/${req.params.type == 'music' ? 'music' : req.params.type + 's'}/img/${Item._id}.jpg`)

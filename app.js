@@ -16,6 +16,7 @@ const socket = require('socket.io')
 const https = require('https')
 const fs = require('fs')
 const moment = require('moment')
+const path = require('path')
 
 const ConfigModel = require('./models/Config.js')
 const UserModel = require('./models/User.js')
@@ -27,10 +28,11 @@ const app = express()
 process.title = process.argv[2]
 
 const server = https.createServer({
-  key: fs.readFileSync(__dirname + '/server.key'),
-  cert: fs.readFileSync(__dirname + '/server.pem')
+  key: fs.readFileSync('/etc/letsencrypt/live/theparadigmdev.com/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/theparadigmdev.com/fullchain.pem'),
 }, app).listen(port, host)
 console.log('\x1b[32m', '[ SERVER ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', `https://${host}:${port}`, '\x1b[0m', 'listening')
+server.timeout = 1000000000
 
 const io = socket(server, {
   // path: '/socket'
@@ -47,8 +49,6 @@ app.use(cors({
   origin: [
     'https://www.theparadigmdev.com',
     'https://theparadigmdev.com',
-    'https://liddy.cf',
-    'https://www.liddy.cf',
     'https://localhost:8080',
     'https://192.168.1.82:8081'
   ]

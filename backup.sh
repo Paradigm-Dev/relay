@@ -17,7 +17,7 @@ function mongodb_dump
   FILE="${DIR}${DB_NAME}_${NOW}.tar.gz"
 
   # Dump the database
-  mongodump --host=192.168.1.82 --port=27017 -d $DB_NAME -o $DIR
+  mongodump --host=192.168.1.2 --port=27017 -d $DB_NAME -o $DIR
 
   # Compress
   tar -zcvf $FILE $DIR$DB_NAME

@@ -8,6 +8,8 @@
 /weights
 /routes/patriot.js
 /campaign
+/flamechat
+/dump
 interpol.json
 blacklist.txt
 log.txt

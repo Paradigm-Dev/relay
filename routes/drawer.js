@@ -7,22 +7,16 @@ const moment = require('moment')
 
 const UserModel = require('../models/User.js')
 
-router.get('/:uid/list', (req, res) => {
-  UserModel.findOne({ _id: req.params.uid }, (error, data) => {
-    if (!error) res.json(data.files)
-  })
-})
-
 router.get('/:uid/download/:id', async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid })
   var File = await User.files.id(req.params.id)
-  res.download(path.join(__dirname + '/../drawer/' + req.params.uid + '/' + File.path))
+  res.download(path.join('/mnt/drawer/' + req.params.uid + '/' + File.path))
 })
 
 router.get('/:uid/get/:id', async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid })
   var File = await User.files.id(req.params.id)
-  res.sendFile(path.join(__dirname + '/../drawer/' + req.params.uid + '/' + File.path))
+  res.sendFile(path.join('/mnt/drawer/' + req.params.uid + '/' + File.path))
 })
 
 router.post('/:uid/rename/:id', async (req, res) => {
@@ -31,7 +25,7 @@ router.post('/:uid/rename/:id', async (req, res) => {
   var newPath
   if (File.type == 'workshop/write') newPath = req.body.name + '.write.json'
   else newPath = req.body.name + '.' + File.path.slice(File.path.lastIndexOf('.') + 1)
-  fs.rename(__dirname + '/../drawer/' + req.params.uid + '/' + File.path, __dirname + '/../drawer/' + req.params.uid + '/' + newPath, (err) => {
+  fs.rename('/mnt/drawer/' + req.params.uid + '/' + File.path, '/mnt/drawer/' + req.params.uid + '/' + newPath, (err) => {
     if (err) throw err;
   })
   File.path = newPath
@@ -43,7 +37,7 @@ router.post('/:uid/rename/:id', async (req, res) => {
 router.delete('/:uid/delete/:id', async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid })
   var File = await User.files.id(req.params.id)  
-  fs.unlink(path.join(__dirname + '/../drawer/' + req.params.uid + '/' + File.path), async error => {
+  fs.unlink(path.join('/mnt/drawer/' + req.params.uid + '/' + File.path), async error => {
     await File.remove()
     await User.save()
     res.end()
@@ -52,7 +46,7 @@ router.delete('/:uid/delete/:id', async (req, res) => {
 })
 
 router.post('/:uid/upload/write', (req, res) => {
-  const pathway = __dirname + `/../drawer/${req.params._uid}/${req.body.title}.write.json`
+  const pathway = `/mnt/drawer/${req.params._uid}/${req.body.title}.write.json`
   if (fs.existsSync(pathway)) fs.unlinkSync(pathway)
   fs.writeFile(pathway, JSON.stringify(req.body), error => {
     if (error) console.error(error)
@@ -77,7 +71,7 @@ router.post('/:uid/upload/write', (req, res) => {
 })
 
 router.post('/:uid/upload/sales', (req, res) => {
-  const pathway = __dirname + `/../drawer/${req.params.uid}/${req.body.title}.sales.json`
+  const pathway = `/mnt/drawer/${req.params.uid}/${req.body.title}.sales.json`
   if (fs.existsSync(pathway)) fs.unlinkSync(pathway)
   fs.writeFile(pathway, JSON.stringify(req.body), error => {
     if (error) console.error(error)
@@ -102,32 +96,28 @@ router.post('/:uid/upload/sales', (req, res) => {
   })
 })
 
-router.post('/:uid/upload', (req, res) => {
-  var form = new formidable.IncomingForm()
+router.post('/:uid/upload', async (req, res) => {
+  const form = formidable({ multiples: true, uploadDir: `/mnt/drawer/${req.params.uid}`, keepExtensions: true, maxFileSize: 100 * 1024 * 1024 * 1024 })
 
-  form.parse(req)
-
-  form.on('fileBegin', (name, file) => {
-    var dir = path.join(__dirname + '/../drawer/' + req.params.uid)
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir)
-    file.path = __dirname + '/../drawer/' + req.params.uid + '/' + file.name
-    if (fs.existsSync(file.path)) {
-      form.pause()
+  await form.parse(req, async (error, fields, files) => {
+    if (error) {
+      console.error(error)
+      res.end()
+    } else {
+      var User = await UserModel.findOne({ _id: req.params.uid })
+      Object.keys(files).forEach(i => {
+        User.files.push({
+          name: files[i].name.slice(0, files[i].name.lastIndexOf('.')),
+          type: files[i].type,
+          size: files[i].size + ' B',
+          date: moment().format('MM/DD/YYYY [at] h:mm a'),
+          path: files[i].name
+        })
+        fs.rename(files[i].path, `/mnt/drawer/${req.params.uid}/${files[i].name}`, () => {})
+      })
+      await User.save()
       res.end()
     }
-  })
-
-  form.on('file', async (name, file) => {
-    var User = await UserModel.findOne({ _id: req.params.uid })
-    User.files.push({
-      name: file.name.slice(0, file.name.lastIndexOf('.')),
-      type: file.type,
-      size: file.size + ' B',
-      date: moment().format('MM/DD/YYYY [at] h:mm a'),
-      path: file.name
-    })
-    await User.save()
-    res.end()
   })
 })
 

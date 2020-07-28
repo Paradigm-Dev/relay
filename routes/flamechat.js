@@ -52,26 +52,6 @@ router.post('/chatroom/new', (req, res) => {
   })
 })
 
-// Chatroom data
-router.get('/chatroom/:id', (req, res) => {
-  ChatroomModel.findOne({ id: req.params.id }, (error, data) => {
-    if (!error) {
-      res.json(data)
-    } else {
-      res.statusCode(500)
-      console.log(error)
-    }
-  })
-})
-
-// Checks if data has changed
-router.get('/chatroom/:id/inspect/:v', (req, res) => {
-  ChatroomModel.findOne({ id: req.params.id }, async (error, data) => {
-    if (data.__v != req.params.v) res.json({ result: true })
-    else res.json({ result: false })
-  })
-})
-
 // Send file
 router.post('/chatroom/:id/file', async (req, res) => {
   var Chatroom = await ChatroomModel.findOne({ id: req.params.id })
@@ -102,31 +82,6 @@ router.post('/dm/:id/file', async (req, res) => {
     await fs.renameSync(file.path, __dirname + '/../files/flamechat/dm/' + DM_data._id + '/' + file.name)
     res.end()
   })
-})
-
-// Send message
-router.post('/chatroom/:id/send', async (req, res) => {
-  var Chatroom = await ChatroomModel.findOne({ id: req.params.id })
-  var message = {
-    color: req.body.color,
-    username: req.body.username,
-    user_id: req.body.user_id,
-    content: req.body.content,
-    timestamp: moment().format('MM/DD/YYYY [at] h:mm a'),
-    id: mongoose.ObjectId,
-    type: req.body.type
-  }
-  Chatroom.messages.push(message)
-  await Chatroom.save()
-  res.json(message)
-})
-
-// Deletes message
-router.get('/chatroom/:id/message/:mid/delete', async (req, res) => {
-  var Chatroom = await ChatroomModel.findOne({ id: req.params.id })
-  Chatroom.messages.pull(req.params.mid)
-  await Chatroom.save()
-  res.json(Chatroom.data)
 })
 
 // Deletes a chatroom

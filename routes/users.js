@@ -248,23 +248,6 @@ router.get('/:uid/moonrocks/:diff', (req, res) => {
   })
 })
 
-// Get list of files in Drawer
-router.get('/:uid/drawer/list', (req, res) => {
-  UserModel.findOne({ _id: req.params.uid }, (error, data) => {
-    if (!error) res.json(data.files)
-    else {
-      console.error(error)
-      res.end()
-    }
-  })
-})
-
-// Get profile pic
-router.get('/:uid/pic', async (req, res) => {
-  var User = await UserModel.findOne({ _id: req.params.uid })
-  res.sendFile(_path.join(__dirname + '/../files/profile-pics/' + User._id + '.jpg'))
-})
-
 // Post profile pic
 router.post('/:uid/pic', async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid })
@@ -336,7 +319,7 @@ router.get('/:uid/delete', async (req, res) => {
       })
     })
   }
-  deleteFolderRecursive(__dirname + '/../drawer/' + User._id)
+  deleteFolderRecursive('/mnt/drawer/' + User._id)
 })
 
 
@@ -782,19 +765,5 @@ router.get('/:uid/people/unblock/:user', async (req, res) => {
 
   res.json(User.people)
 })
-
-
-
-// router.get('/:uid/people', async (req, res) => {
-//   var User = await UserModel.findOne({ _id: req.params.uid })
-//   var People = []
-//   await User.people.forEach(async person => {
-//     var Person = await UserModel.findOne({ _id: person._id })
-
-//     People.push(Person)
-//   }),
-//   console.log(People)
-//   if (a_done && r_done && s_done && b_done) res.json(People)
-// })
 
 module.exports = router
