@@ -40,7 +40,7 @@ router.delete('/:uid/delete/:id', async (req, res) => {
   fs.unlink(path.join('/mnt/drawer/' + req.params.uid + '/' + File.path), async error => {
     await File.remove()
     await User.save()
-    res.end()
+    res.json(User)
     if (error) throw error
   })
 })
@@ -116,7 +116,7 @@ router.post('/:uid/upload', async (req, res) => {
         fs.rename(files[i].path, `/mnt/drawer/${req.params.uid}/${files[i].name}`, () => {})
       })
       await User.save()
-      res.end()
+      res.json(User)
     }
   })
 })
