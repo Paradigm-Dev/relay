@@ -5,8 +5,8 @@ const UserModel = require('./../models/User.js')
 
 module.exports = io => {
   var terminal = io.of('/terminal').on('connection', async socket => {
-    var log = fs.readFileSync(__dirname + '/../relay.log')
-    socket.emit('log', log)
+    // var log = fs.readFileSync(__dirname + '/../relay.log')
+    // socket.emit('log', log)
 
     socket.on('config', async data => {
       var newConfig = await ConfigModel.findOne({ find: 'this' })

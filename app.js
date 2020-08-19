@@ -50,7 +50,7 @@ app.use(cors({
     'https://www.theparadigmdev.com',
     'https://theparadigmdev.com',
     'https://localhost:8080',
-    'https://192.168.1.82:8081'
+    'https://192.168.1.178:8080'
   ]
 }))
 
@@ -70,11 +70,8 @@ app.use(
   })
 )
 
-// ROVER
-app.use('/rover', express.static(__dirname + '/rover'))
-
 // PARADIGM
-app.use('/', express.static(__dirname + '/paradigm'))
+app.use('/', express.static(__dirname + '/dist'))
 
 // CAMPAIGN
 // app.use('/campaign', express.static(__dirname + '/campaign'))
@@ -85,7 +82,6 @@ app.use('/relay/movies', express.static('/mnt/movies'))
 
 // ROUTES
 app.use('/api/users', require('./routes/users.js'))
-app.use('/api/users/migrate', require('./routes/migrate.js'))
 app.use('/api/flamechat', require('./routes/flamechat.js'))
 app.use('/api/paradox', require('./routes/paradox.js'))
 app.use('/api/media', require('./routes/media.js'))
@@ -94,6 +90,7 @@ app.use('/api/terminal', require('./routes/terminal.js'))
 app.use('/api/patriot', require('./routes/patriot.js'))
 app.use('/api/broadcast', require('./routes/broadcast.js'))
 app.use('/api/apollo', require('./routes/apollo.js'))
+app.use('/api/bugs', require('./routes/bugs.js'))
 app.use('/api', require('./routes/index.js'))
 
 mongoose.connect(`mongodb://${host}:27017/paradigm`, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }).then(() => console.log('\x1b[32m', '[   DB   ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', `mongodb://${host}:27017`, '\x1b[0m', 'connected')).catch(error => console.error(error))
