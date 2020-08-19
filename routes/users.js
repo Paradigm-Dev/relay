@@ -15,6 +15,7 @@ const DMModel = require('../models/DM.js')
 const BookModel = require('../models/Book.js')
 const MovieModel = require('../models/Movie.js')
 const MusicModel = require('../models/Music.js')
+const BugModel = require('../models/Bug.js')
 
 // Register
 router.post('/register', (req, res) => {
@@ -32,7 +33,7 @@ router.post('/register', (req, res) => {
         created: moment().format('dddd, MMMM Do YYYY [at] h:mm a')
       })
 
-      ApolloModel.findOneAndUpdate({ code: req.body.code }, { $set: { used: true, username: user.username, uid: user._id } })
+      ApolloModel.findOneAndUpdate({ code: req.body.code }, { $set: { used: true, username: newUser.username, uid: newUser._id } })
 
       fs.mkdirSync(__dirname + '/../drawer/' + newUser._id)
 
@@ -116,6 +117,8 @@ router.post('/update', async (req, res) => {
     await Person.save()
   })
 
+  // await UserModel.updateMany({ 'people.approved.uid': user._id }, { $set: { 'people.approved.$.username':  } })
+
   user.people.approved.forEach(async person => {
     var Person = await UserModel.findOne({ _id: person._id })
     var Index = Person.people.approved.findIndex(request => { return request._id == user._id })
@@ -129,6 +132,9 @@ router.post('/update', async (req, res) => {
     DM.people[DM_index].color = req.body.color
     DM.save()
   })
+
+  ApolloModel.findOneAndUpdate({ uid: req.params.uid }, { $set: { username: req.body.username } })
+  BugModel.updateMany({ uid: req.params.uid }, { $set: { username: req.body.username } })
 
   // user.people.requests.forEach(person => people_to_update.push(person._id))
   user.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + user._id + '.jpg'

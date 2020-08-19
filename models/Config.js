@@ -12,7 +12,15 @@ const RouterConfigSchema = new mongoose.Schema({
   people: Boolean,
   broadcast: Boolean,
   transmission: Boolean,
-  developer: Boolean
+  developer: Boolean,
+  downloads: Boolean
+})
+
+const DownloadsSchema = new mongoose.Schema({
+  capture: {
+    win: String,
+    mac: String
+  }
 })
 
 const ConfigSchema = new mongoose.Schema({
@@ -22,7 +30,8 @@ const ConfigSchema = new mongoose.Schema({
   shutdown: Boolean,
   router: RouterConfigSchema,
   find: String,
-  banned: [String]
+  banned: [String],
+  downloads: DownloadsSchema
 }, { collection: 'config' })
 
 const ConfigModel = mongoose.model('config', ConfigSchema)
