@@ -46,7 +46,9 @@ const PostSchema = new mongoose.Schema({
   content: String,
   timestamp: String,
   likes: Number,
-  reposts: Number
+  reposts: Number,
+  file_path: String,
+  file_type: String
 })
 
 const UserSchema = new mongoose.Schema({

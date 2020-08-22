@@ -35,7 +35,8 @@ router.post('/register', (req, res) => {
 
       ApolloModel.findOneAndUpdate({ code: req.body.code }, { $set: { used: true, username: newUser.username, uid: newUser._id } })
 
-      fs.mkdirSync(__dirname + '/../drawer/' + newUser._id)
+      fs.mkdirSync('/mnt/drawer/' + newUser._id)
+      fs.mkdirSync(__dirname + '/../broadcast/' + newUser._id)
 
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -92,9 +93,9 @@ router.post('/reset', async (req, res) => {
 router.post('/update', async (req, res) => {
   var user = await UserModel.findOne({ username: req.body.old })
 
-  user.username = req.body.username
-  user.bio = req.body.bio
-  user.color = req.body.color
+  if (req.body.username) user.username = req.body.username
+  if (req.body.bio) user.bio = req.body.bio
+  if (req.body.color) user.color = req.body.color
 
   await user.save()
 
@@ -319,6 +320,7 @@ router.get('/:uid/delete', async (req, res) => {
             await Person.people.approved.splice(Index, 1)
             await Person.save()
           })
+          await ApolloModel.findOneAndDelete({ uid: req.params.uid })
           await UserModel.findOneAndDelete({ _id: req.params.uid })
           res.end()
         })
@@ -326,6 +328,7 @@ router.get('/:uid/delete', async (req, res) => {
     })
   }
   deleteFolderRecursive('/mnt/drawer/' + User._id)
+  deleteFolderRecursive(__dirname + '/../files/broadcast/' + User._id)
 })
 
 
@@ -664,7 +667,7 @@ router.get('/:uid/people/request/:user/approve', async (req, res) => {
     ]
   })
 
-  await fs.mkdirSync(__dirname + `/../flamechat/dm/${new_dm._id}`)
+  await fs.mkdirSync(__dirname + `/../files/flamechat/dm/${new_dm._id}`)
 
   await User.people.approved.push({
     _id: req.params.user,
@@ -726,7 +729,28 @@ router.get('/:uid/people/remove/:user', async (req, res) => {
   var User_I = await User.people.approved.findIndex(person => { return person._id == req.params.user })
   var Person_I = await Person.people.approved.findIndex(person => { return person._id == req.params.uid })
 
-  await DMModel.findOneAndDelete({ _id: User.dm })
+  User.people.approved[User_I].liked_posts.forEach(post => Person.posts.id(post).likes--)
+  Person.people.approved[Person_I].liked_posts.forEach(post => User.posts.id(post).likes--)
+
+  await DMModel.findOneAndDelete({ _id: User.people.approved[User_I].dm })
+  async function deleteFolderRecursive(path) {
+    fs.readdir(path, async (error, files) => {
+      if (error) console.error(error)
+      else {
+        await files.forEach(async file => {
+          var curPath = path + '/' + file
+          await fs.lstat(curPath, async (error, stats) => {
+            if (stats.isDirectory()) {
+              deleteFolderRecursive(curPath)
+            } else {
+              await fs.unlink(curPath, () => {})
+            }
+          })
+        })
+      }
+    })
+  }
+  await deleteFolderRecursive(__dirname + `/../files/flamechat/dm/${User.people.approved[User_I].dm}`)
 
   await User.people.approved[User_I].remove()
   await Person.people.approved[Person_I].remove()
@@ -734,7 +758,10 @@ router.get('/:uid/people/remove/:user', async (req, res) => {
   await User.save()
   await Person.save()
 
-  res.json(User.people)
+  res.json({
+    user: User,
+    profile: Person
+  })
 })
 
 router.get('/:uid/people/block/:user', async (req, res) => {
