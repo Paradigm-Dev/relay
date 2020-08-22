@@ -69,7 +69,7 @@ router.get('/music/get', (req, res) => {
 
 // Upload
 router.post('/create/data', async (req, res) => {
-  console.log(req.body)
+  // console.log(req.body)
   let _id
   switch (req.body.type) {
     case 'book':
@@ -91,11 +91,23 @@ router.post('/create/data', async (req, res) => {
         genre: req.body.genre,
         live: true,
         cover: `https://www.theparadigmdev.com/relay/movies/img/${_id.toString()}.jpg`,
-        link: `https://www.theparadigmdev.com/relay/movies/${_id.toString()}.pdf`,
+        link: `https://www.theparadigmdev.com/relay/movies/${_id.toString()}.mp4`,
         summary: req.body.summary,
         title: req.body.title
       }, (error, movie) => res.json({ _id: movie._id }))
-      console.log(_id)
+      // console.log(_id)
+      break
+    case 'music':
+      _id = new mongoose.Types.ObjectId()
+      await MusicModel.create({
+        _id,
+        artist: req.body.artist,
+        live: true,
+        cover: `https://www.theparadigmdev.com/relay/music/img/${_id.toString()}.jpg`,
+        genre: req.body.genre,
+        title: req.body.title,
+        songs: req.body.songs
+      }, (error, album) => res.json({ _id: album._id }))
       break
   }
 })
@@ -105,7 +117,7 @@ router.post('/create/:id/files/:type', async (req, res) => {
   switch (req.params.type) {
     case 'book': Item = await BookModel.findOne({ _id: req.params.id }); break;
     case 'movie': Item = await MovieModel.findOne({ _id: req.params.id }); break;
-    // case 'music': Item = await MusicModel.findOne({ _id: req.params.id })
+    case 'music': Item = await MusicModel.findOne({ _id: req.params.id }); break;
   }
 
   const form = formidable({ multiples: false, uploadDir: __dirname + `/../files/${req.params.type == 'music' ? 'music' : req.params.type + 's'}/`, keepExtensions: true })
@@ -116,10 +128,20 @@ router.post('/create/:id/files/:type', async (req, res) => {
       return
     }
 
+    console.log(files)
+
     await Jimp.read(files.cover.path).then(img => {
       return img.write(__dirname + `/../files/${req.params.type == 'music' ? 'music' : req.params.type + 's'}/img/${Item._id}.jpg`)
     }).catch(error => console.error(error))
-    await fs.renameSync(files.file.path, __dirname + `/../files/${req.params.type == 'music' ? 'music' : req.params.type + 's'}/${Item._id}.${files.file.name.slice(files.file.name.lastIndexOf('.') + 1)}`)
+    if (req.params.type != 'music') await fs.renameSync(files.file.path, __dirname + `/../files/${req.params.type + 's'}/${Item._id}.${files.file.name.slice(files.file.name.lastIndexOf('.') + 1)}`)
+    else {
+      await fs.mkdirSync(__dirname + `/../files/music/${Item._id}`)
+      await Item.songs.forEach(async song => {
+        song.file = `https://www.theparadigmdev.com/relay/music/${Item._id}/${song.track}.${files[song.track].name.slice(files[song.track].name.lastIndexOf('.') + 1)}`
+        await fs.renameSync(files[song.track].path, __dirname + `/../files/music/${Item._id}/${song.track}.${files[song.track].name.slice(files[song.track].name.lastIndexOf('.') + 1)}`)
+      })
+      await Item.save()
+    }
     res.json(Item)
   })
 })
