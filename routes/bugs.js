@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 const BugModel = require('../models/Bug.js')
+const UserModel = require('../models/User.js')
 
 router.post('/:uid', async (req, res) => {
   var bug = req.body
@@ -17,15 +18,17 @@ router.get('/', async (req, res) => {
 })
 
 router.put('/:id', async (req, res) => {
-  await BugModel.findOneAndUpdate({ _id: req.params.id }, { $set: { fixed: true } })
+  const Bug = await BugModel.findOneAndUpdate({ _id: req.params.id }, { $set: { fixed: true } })
+  await UserModel.findOneAndUpdate({ _id: Bug.uid }, { $inc: { moonrocks: +15 } })
   
   const Bugs = await BugModel.find({})
   res.json(Bugs)
 })
 
 router.get('/:id', async (req, res) => {
-  await BugModel.findOneAndUpdate({ _id: req.params.id }, { $set: { fixed: false } })
-  
+  const Bug = await BugModel.findOneAndUpdate({ _id: req.params.id }, { $set: { fixed: false } })
+  await UserModel.findOneAndUpdate({ _id: Bug.uid }, { $inc: { moonrocks: -15 } })
+
   const Bugs = await BugModel.find({})
   res.json(Bugs)
 })
