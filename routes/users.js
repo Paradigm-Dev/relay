@@ -134,8 +134,8 @@ router.post('/update', async (req, res) => {
     DM.save()
   })
 
-  ApolloModel.findOneAndUpdate({ uid: req.params.uid }, { $set: { username: req.body.username } })
-  BugModel.updateMany({ uid: req.params.uid }, { $set: { username: req.body.username } })
+  await ApolloModel.findOneAndUpdate({ uid: user._id }, { $set: { username: req.body.username } })
+  await BugModel.updateMany({ uid: user._id }, { $set: { username: req.body.username } })
 
   // user.people.requests.forEach(person => people_to_update.push(person._id))
   user.pic = 'https://www.theparadigmdev.com/relay/profile-pics/' + user._id + '.jpg'
