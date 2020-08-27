@@ -2,8 +2,8 @@ const ConfigModel = require('../models/Config.js')
 const UserModel = require('../models/User.js')
 const moment = require('moment')
 
-module.exports = io => {
-  var connections = []
+let connections = []
+module.exports = { socket: (io) => {
 
   io.on('connection', async socket => {
     console.log('\x1b[32m', '[ SOCKET ]', '\x1b[31m', moment().format('MM/DD/YYYY, HH:MM:SS'), '\x1b[34m', socket.id, '\x1b[0m', 'connected')
@@ -86,4 +86,4 @@ module.exports = io => {
       connections[to_index].socket.emit('transmit_received', data)
     })
   })
-}
+}, connections }

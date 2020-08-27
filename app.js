@@ -38,7 +38,7 @@ const io = socket(server, {
   // path: '/socket'
 })
 
-require('./sockets/index.js')(io)
+require('./sockets/index.js').socket(io)
 require('./sockets/flamechat.js')(io)
 require('./sockets/terminal.js')(io)
 require('./sockets/transmission.js')(io)
