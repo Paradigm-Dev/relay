@@ -1,37 +1,37 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const UserBookSchema = new mongoose.Schema({
   book_id: String,
   rating: Number,
-  favorite: Boolean
-})
+  favorite: Boolean,
+});
 
 const UserMovieSchema = new mongoose.Schema({
   movie_id: String,
   rating: Number,
-  favorite: Boolean
-})
+  favorite: Boolean,
+});
 
 const UserMusicSchema = new mongoose.Schema({
   music_id: String,
   rating: Number,
-  favorite: Boolean
-})
+  favorite: Boolean,
+});
 
 const StoredChatroomSchema = new mongoose.Schema({
   name: String,
   id: String,
   icon: String,
-  status: String
-})
+  status: String,
+});
 
 const FileSchema = new mongoose.Schema({
   name: String,
   type: String,
   size: String,
   date: String,
-  path: String
-})
+  path: String,
+});
 
 const FriendSchema = new mongoose.Schema({
   _id: String,
@@ -39,8 +39,8 @@ const FriendSchema = new mongoose.Schema({
   color: String,
   pic: String,
   liked_posts: [String],
-  dm: String
-})
+  dm: String,
+});
 
 const PostSchema = new mongoose.Schema({
   content: String,
@@ -48,8 +48,8 @@ const PostSchema = new mongoose.Schema({
   likes: Number,
   reposts: Number,
   file_path: String,
-  file_type: String
-})
+  file_type: String,
+});
 
 const UserSchema = new mongoose.Schema({
   username: String,
@@ -63,14 +63,14 @@ const UserSchema = new mongoose.Schema({
     approved: [FriendSchema],
     blocked: [FriendSchema],
     sent: [FriendSchema],
-    blocked_by: [String]
+    blocked_by: [String],
   },
   rights: {
     admin: Boolean,
     author: Boolean,
     asteroid: Boolean,
     patriot: Boolean,
-    developer: Boolean
+    developer: Boolean,
   },
   moonrocks: Number,
   books: [UserBookSchema],
@@ -84,10 +84,11 @@ const UserSchema = new mongoose.Schema({
   posts: [PostSchema],
   apollo_codes: {
     created: Number,
-    quota: Number
-  }
-})
+    quota: Number,
+  },
+  pinned_apps: [String],
+});
 
-const UserModel = mongoose.model('user', UserSchema)
+const UserModel = mongoose.model("user", UserSchema);
 
-module.exports = UserModel
+module.exports = UserModel;

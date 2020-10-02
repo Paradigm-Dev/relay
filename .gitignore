@@ -17,3 +17,4 @@ suspicious.log
 server.key
 server.pem
 .DS_Store
+/.deno_plugins
