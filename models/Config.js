@@ -1,39 +1,32 @@
-const mongoose = require('mongoose')
-
-const RouterConfigSchema = new mongoose.Schema({
-  flamechat: Boolean,
-  satellite: Boolean,
-  paradox: Boolean,
-  drawer: Boolean,
-  media: Boolean,
-  home: Boolean,
-  corona: Boolean,
-  write: Boolean,
-  people: Boolean,
-  broadcast: Boolean,
-  transmission: Boolean,
-  developer: Boolean,
-  downloads: Boolean
-})
+const mongoose = require("mongoose");
 
 const DownloadsSchema = new mongoose.Schema({
   capture: {
     win: String,
-    mac: String
-  }
-})
+    mac: String,
+  },
+  intelligence: {
+    win: String,
+    mac: String,
+  },
+});
 
-const ConfigSchema = new mongoose.Schema({
-  sign_up: Boolean,
-  migrate: Boolean,
-  reset: Boolean,
-  shutdown: Boolean,
-  router: RouterConfigSchema,
-  find: String,
-  banned: [String],
-  downloads: DownloadsSchema
-}, { collection: 'config' })
+const ConfigSchema = new mongoose.Schema(
+  {
+    auth: {
+      sign_in: Boolean,
+      sign_up: Boolean,
+      recover: Boolean,
+    },
+    shutdown: Boolean,
+    apps: mongoose.Mixed,
+    find: String,
+    banned: [String],
+    downloads: DownloadsSchema,
+  },
+  { collection: "config" }
+);
 
-const ConfigModel = mongoose.model('config', ConfigSchema)
+const ConfigModel = mongoose.model("config", ConfigSchema);
 
-module.exports = ConfigModel
+module.exports = ConfigModel;
