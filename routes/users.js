@@ -35,7 +35,7 @@ router.post("/register", (req, res) => {
 
       ApolloModel.findOneAndUpdate(
         { code: req.body.code },
-        { $set: { used: true, username: newUser.username, uid: newUser._id } },
+        { $set: { used: true, username: newUser.username, uid: newUser._id } }
       );
 
       fs.mkdirSync("/mnt/drawer/" + newUser._id);
@@ -45,9 +45,12 @@ router.post("/register", (req, res) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
           if (err) throw err;
           newUser.password = hash;
-          newUser.save().then((user) => {
-            res.json(user);
-          }).catch((err) => console.error(err));
+          newUser
+            .save()
+            .then((user) => {
+              res.json(user);
+            })
+            .catch((err) => console.error(err));
         });
       });
     }
@@ -64,8 +67,10 @@ router.post("/signin", (req, res, next) => {
       res.json({ msg: "The username and password do not match an account." });
     }
     if (!err && user) {
-      user.pic = "https://www.theparadigmdev.com/relay/profile-pics/" +
-        user._id + ".jpg";
+      user.pic =
+        "https://www.theparadigmdev.com/relay/profile-pics/" +
+        user._id +
+        ".jpg";
       res.json(user);
       req.login(user, next);
     }
@@ -101,6 +106,7 @@ router.post("/update", async (req, res) => {
   if (req.body.bio) user.bio = req.body.bio;
   if (req.body.color) user.color = req.body.color;
   if (req.body.pinned_apps) user.pinned_apps = req.body.pinned_apps;
+  if (req.body.chatrooms) user.chatrooms = req.body.chatrooms;
 
   await user.save();
 
@@ -149,16 +155,16 @@ router.post("/update", async (req, res) => {
 
   await ApolloModel.findOneAndUpdate(
     { uid: user._id },
-    { $set: { username: req.body.username } },
+    { $set: { username: req.body.username } }
   );
   await BugModel.updateMany(
     { uid: user._id },
-    { $set: { username: req.body.username } },
+    { $set: { username: req.body.username } }
   );
 
   // user.people.requests.forEach(person => people_to_update.push(person._id))
-  user.pic = "https://www.theparadigmdev.com/relay/profile-pics/" + user._id +
-    ".jpg";
+  user.pic =
+    "https://www.theparadigmdev.com/relay/profile-pics/" + user._id + ".jpg";
 
   res.json(user);
 });
@@ -186,7 +192,9 @@ router.get("/list", async (req, res) => {
       color: person.color,
       in: person.in,
       bio: person.bio,
-      pic: "https://www.theparadigmdev.com/relay/profile-pics/" + person._id +
+      pic:
+        "https://www.theparadigmdev.com/relay/profile-pics/" +
+        person._id +
         ".jpg",
       _id: person._id,
       posts: person.posts,
@@ -217,7 +225,9 @@ router.get("/:uid/info", async (req, res) => {
       color: Person.color,
       in: Person.in,
       bio: Person.bio,
-      pic: "https://www.theparadigmdev.com/relay/profile-pics/" + Person._id +
+      pic:
+        "https://www.theparadigmdev.com/relay/profile-pics/" +
+        Person._id +
         ".jpg",
       _id: Person._id,
     };
@@ -244,8 +254,7 @@ router.get("/:uid/chatroom/:id/:func", async (req, res) => {
           _id: User._id,
           username: User.username,
           color: User.color,
-          pic:
-            `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
+          pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
         });
         User.chatrooms.push({
           name: Chatroom.name,
@@ -255,8 +264,10 @@ router.get("/:uid/chatroom/:id/:func", async (req, res) => {
         });
         await Chatroom.save();
         await User.save();
-        User.pic = "https://www.theparadigmdev.com/relay/profile-pics/" +
-          User._id + ".jpg";
+        User.pic =
+          "https://www.theparadigmdev.com/relay/profile-pics/" +
+          User._id +
+          ".jpg";
         res.json(User);
       } else res.json({ error: "banned" });
       break;
@@ -267,8 +278,10 @@ router.get("/:uid/chatroom/:id/:func", async (req, res) => {
       });
       User.chatrooms[Index].remove();
       await User.save();
-      User.pic = "https://www.theparadigmdev.com/relay/profile-pics/" +
-        User._id + ".jpg";
+      User.pic =
+        "https://www.theparadigmdev.com/relay/profile-pics/" +
+        User._id +
+        ".jpg";
       res.json(User);
       break;
   }
@@ -282,7 +295,7 @@ router.get("/:uid/moonrocks/:diff", (req, res) => {
     (error, data) => {
       console.log(data);
       res.json(data);
-    },
+    }
   );
 });
 
@@ -291,13 +304,11 @@ router.post("/:uid/pic", async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid });
   var file;
 
-  const form = formidable(
-    {
-      multiples: false,
-      uploadDir: __dirname + "/../files/profile-pics/",
-      keepExtensions: true,
-    },
-  );
+  const form = formidable({
+    multiples: false,
+    uploadDir: __dirname + "/../files/profile-pics/",
+    keepExtensions: true,
+  });
 
   await form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -306,15 +317,17 @@ router.post("/:uid/pic", async (req, res) => {
     }
 
     file = files["files[0]"];
-    await Jimp.read(file.path).then((img) => {
-      return img
-        .resize(Jimp.AUTO, 150)
-        .quality(50)
-        .write(__dirname + "/../files/profile-pics/" + User._id + ".jpg");
-    }).catch((error) => console.error(error));
+    await Jimp.read(file.path)
+      .then((img) => {
+        return img
+          .resize(Jimp.AUTO, 150)
+          .quality(50)
+          .write(__dirname + "/../files/profile-pics/" + User._id + ".jpg");
+      })
+      .catch((error) => console.error(error));
     // await fs.renameSync(file.path, __dirname + '/../files/profile-pics/' + User._id + '.jpg')
-    User.pic = "https://www.theparadigmdev.com/relay/profile-pics/" + User._id +
-      ".jpg";
+    User.pic =
+      "https://www.theparadigmdev.com/relay/profile-pics/" + User._id + ".jpg";
     res.json(User);
   });
 });
@@ -369,7 +382,7 @@ router.get("/:uid/delete", async (req, res) => {
             await ApolloModel.findOneAndDelete({ uid: req.params.uid });
             await UserModel.findOneAndDelete({ _id: req.params.uid });
             res.end();
-          },
+          }
         );
       });
     });
@@ -706,15 +719,13 @@ router.get("/:uid/people/request/:user/approve", async (req, res) => {
         _id: User._id,
         username: User.username,
         color: User.color,
-        pic:
-          `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
+        pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
       },
       {
         _id: Person._id,
         username: Person.username,
         color: Person.color,
-        pic:
-          `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`,
+        pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`,
       },
     ],
   });
@@ -793,11 +804,11 @@ router.get("/:uid/people/remove/:user", async (req, res) => {
     return person._id == req.params.uid;
   });
 
-  User.people.approved[User_I].liked_posts.forEach((post) =>
-    Person.posts.id(post).likes--
+  User.people.approved[User_I].liked_posts.forEach(
+    (post) => Person.posts.id(post).likes--
   );
-  Person.people.approved[Person_I].liked_posts.forEach((post) =>
-    User.posts.id(post).likes--
+  Person.people.approved[Person_I].liked_posts.forEach(
+    (post) => User.posts.id(post).likes--
   );
 
   await DMModel.findOneAndDelete({ _id: User.people.approved[User_I].dm });
@@ -819,7 +830,7 @@ router.get("/:uid/people/remove/:user", async (req, res) => {
     });
   }
   await deleteFolderRecursive(
-    __dirname + `/../files/flamechat/dm/${User.people.approved[User_I].dm}`,
+    __dirname + `/../files/flamechat/dm/${User.people.approved[User_I].dm}`
   );
 
   await User.people.approved[User_I].remove();
@@ -876,7 +887,7 @@ router.get("/:uid/people/unblock/:user", async (req, res) => {
 router.post("/:uid/chatroomOrder", async (req, res) => {
   await UserModel.findOneAndUpdate(
     { _id: req.params.uid },
-    { $set: { chatrooms: req.body } },
+    { $set: { chatrooms: req.body } }
   );
   res.json(await UserModel.findOne({ _id: req.params.uid }));
 });
