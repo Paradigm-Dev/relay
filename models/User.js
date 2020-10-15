@@ -51,6 +51,10 @@ const PostSchema = new mongoose.Schema({
   file_type: String,
 });
 
+const PreflightSchema = new mongoose.Schema({
+  in_recovery: Boolean,
+});
+
 const UserSchema = new mongoose.Schema({
   username: String,
   password: String,
@@ -87,6 +91,7 @@ const UserSchema = new mongoose.Schema({
     quota: Number,
   },
   pinned_apps: [String],
+  preflight: PreflightSchema,
 });
 
 const UserModel = mongoose.model("user", UserSchema);
