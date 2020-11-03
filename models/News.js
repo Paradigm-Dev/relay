@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const NewsSchema = new mongoose.Schema({
   author: String,
@@ -6,9 +6,9 @@ const NewsSchema = new mongoose.Schema({
   content: String,
   timestamp: String,
   title: String,
-  live: Boolean
-})
+  live: Boolean,
+});
 
-const NewsModel = mongoose.model('new', NewsSchema)
+const NewsModel = mongoose.model("new", NewsSchema);
 
-module.exports = NewsModel
+module.exports = NewsModel;

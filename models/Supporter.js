@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const SupporterSchema = new mongoose.Schema({
   f_name: String,
@@ -6,9 +6,9 @@ const SupporterSchema = new mongoose.Schema({
   email: String,
   phone: String,
   notify: Boolean,
-  wishes: String
-})
+  wishes: String,
+});
 
-const SupporterModel = mongoose.model('supporter', SupporterSchema)
+const SupporterModel = mongoose.model("supporter", SupporterSchema);
 
-module.exports = SupporterModel
+module.exports = SupporterModel;

@@ -11,8 +11,8 @@ const ConfigModel = require("../models/Config.js");
 router.get("/user/:username/view", async (req, res) => {
   var User = await UserModel.findOne({ username: req.params.username });
   if (User) {
-    delete User.password
-    delete User.__v
+    delete User.password;
+    delete User.__v;
     res.json(User);
   } else res.json({ error: `user ${req.params.username} not found` });
 });
@@ -78,7 +78,7 @@ router.get("/list/music", async (req, res) => {
 router.put("/app", async (req, res) => {
   await ConfigModel.findOneAndUpdate(
     { find: "this" },
-    { $set: { [`apps.${req.body.app}.${req.body.key}`]: req.body.value } },
+    { $set: { [`apps.${req.body.app}.${req.body.key}`]: req.body.value } }
   );
   res.json(await ConfigModel.findOne({ find: "this" }));
 });

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const MessageSchema = new mongoose.Schema({
   color: String,
@@ -9,21 +9,21 @@ const MessageSchema = new mongoose.Schema({
   timestamp: String,
   edits: Number,
   type: String,
-  url: String
-})
+  url: String,
+});
 
 const PersonSchema = new mongoose.Schema({
   _id: String,
   username: String,
   color: String,
-  pic: String
-})
+  pic: String,
+});
 
 const DMSchema = new mongoose.Schema({
   messages: [MessageSchema],
-  people: [PersonSchema]
-})
+  people: [PersonSchema],
+});
 
-const DMModel = mongoose.model('dm', DMSchema)
+const DMModel = mongoose.model("dm", DMSchema);
 
-module.exports = DMModel
+module.exports = DMModel;

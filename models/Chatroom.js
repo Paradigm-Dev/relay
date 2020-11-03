@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const MessageSchema = new mongoose.Schema({
   color: String,
@@ -9,15 +9,15 @@ const MessageSchema = new mongoose.Schema({
   timestamp: String,
   edits: Number,
   type: String,
-  url: String
-})
+  url: String,
+});
 
 const PersonSchema = new mongoose.Schema({
   _id: String,
   username: String,
   color: String,
-  pic: String
-})
+  pic: String,
+});
 
 const ChatroomSchema = new mongoose.Schema({
   messages: [MessageSchema],
@@ -29,10 +29,10 @@ const ChatroomSchema = new mongoose.Schema({
   people: {
     approved: [PersonSchema],
     requested: [PersonSchema],
-    banned: [PersonSchema]
-  }
-})
+    banned: [PersonSchema],
+  },
+});
 
-const ChatroomModel = mongoose.model('chatroom', ChatroomSchema)
+const ChatroomModel = mongoose.model("chatroom", ChatroomSchema);
 
-module.exports = ChatroomModel
+module.exports = ChatroomModel;
