@@ -11,23 +11,9 @@ const ConfigModel = require("../models/Config.js");
 router.get("/user/:username/view", async (req, res) => {
   var User = await UserModel.findOne({ username: req.params.username });
   if (User) {
-    var user = {
-      username: User.username,
-      color: User.color,
-      _id: User._id,
-      bio: User.bio,
-      moonrocks: User.moonrocks,
-      rights: {
-        admin: User.rights.admin,
-        author: User.rights.author,
-        asteroid: User.rights.asteroid,
-        developer: User.rights.developer,
-      },
-      banned: User.banned,
-      strikes: User.strikes,
-      in: User.in,
-    };
-    res.json(user);
+    delete User.password
+    delete User.__v
+    res.json(User);
   } else res.json({ error: `user ${req.params.username} not found` });
 });
 

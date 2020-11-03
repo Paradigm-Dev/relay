@@ -91,7 +91,7 @@ const UserSchema = new mongoose.Schema({
     quota: Number,
   },
   pinned_apps: [String],
-  preflight: PreflightSchema,
+  preflight: mongoose.Schema.Types.Mixed,
 });
 
 const UserModel = mongoose.model("user", UserSchema);
