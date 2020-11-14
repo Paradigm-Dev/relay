@@ -37,4 +37,32 @@ router.post("/:uid/subscribe", async (req, res) => {
   );
 });
 
+router.post("/gh-release", async (req, res) => {
+  res.status(200).json({});
+
+  const users = await UserModel.find({});
+
+  let payload;
+
+  if (req.body.release) {
+    payload = JSON.stringify({
+      title: req.body.release.name,
+      body: "New Paradigm update released!",
+    });
+  } else {
+    payload = JSON.stringify({
+      title: "Paradigm",
+      body: "New Paradigm update released!",
+    });
+  }
+
+  users.forEach((user) => {
+    user.notifications.forEach((subscription) => {
+      webpush
+        .sendNotification(subscription, payload)
+        .catch((err) => console.error(err));
+    });
+  });
+});
+
 module.exports = router;
