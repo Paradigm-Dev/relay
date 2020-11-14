@@ -23,6 +23,11 @@ const ConfigSchema = new mongoose.Schema(
     find: String,
     banned: [String],
     downloads: DownloadsSchema,
+    landing: {
+      date: String,
+      title: String,
+      body: String,
+    },
   },
   { collection: "config" }
 );
