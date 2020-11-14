@@ -109,7 +109,10 @@ module.exports = (io) => {
                 (person) => person._id == data.user_id
               );
               const recipient = await UserModel.findOne({
-                _id: sender_index == 0 ? dm_send.people[0] : dm_send.people[1],
+                _id:
+                  sender_index == 0
+                    ? dm_send.people[1]._id
+                    : dm_send.people[0]._id,
               });
               const payload = JSON.stringify({
                 title: `DM from ${dm_send.people[sender_index].username}`,
