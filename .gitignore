@@ -18,3 +18,4 @@ server.key
 server.pem
 .DS_Store
 /.deno_plugins
+config/vapid.js
