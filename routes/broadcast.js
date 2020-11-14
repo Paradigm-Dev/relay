@@ -52,8 +52,6 @@ router.get("/:uid/like/:profile/:post", async (req, res) => {
     { _id: req.params.profile, "posts._id": req.params.post },
     { $inc: { "posts.$.likes": 1 } }
   );
-  User.pic = `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`;
-  Profile.pic = `https://www.theparadigmdev.com/relay/profile-pics/${Profile._id}.jpg`;
   res.json({
     user: await UserModel.findOne({ _id: req.params.uid }),
     profile: await UserModel.findOne({ _id: req.params.profile }),
@@ -76,8 +74,6 @@ router.get("/:uid/unlike/:profile/:post", async (req, res) => {
     { _id: req.params.profile, "posts._id": req.params.post },
     { $inc: { "posts.$.likes": -1 } }
   );
-  User.pic = `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`;
-  Profile.pic = `https://www.theparadigmdev.com/relay/profile-pics/${Profile._id}.jpg`;
   res.json({
     user: await UserModel.findOne({ _id: req.params.uid }),
     profile: await UserModel.findOne({ _id: req.params.profile }),

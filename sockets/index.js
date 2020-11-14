@@ -47,7 +47,6 @@ module.exports = {
           var newUser = await UserModel.findOne({ username: data.username });
           if (newUser != User) {
             User = newUser;
-            User.pic = `https://www.theparadigmdev.com/relay/profile-pics/${newUser._id}.jpg`;
             socket.emit("user", User);
           }
         }, 2000);

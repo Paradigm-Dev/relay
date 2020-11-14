@@ -5,7 +5,6 @@ const MessageSchema = new mongoose.Schema({
   username: String,
   user_id: String,
   content: String,
-  pic: String,
   timestamp: String,
   edits: Number,
   type: String,
@@ -16,7 +15,6 @@ const PersonSchema = new mongoose.Schema({
   _id: String,
   username: String,
   color: String,
-  pic: String,
 });
 
 const ChatroomSchema = new mongoose.Schema({

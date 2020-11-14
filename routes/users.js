@@ -67,10 +67,6 @@ router.post("/signin", (req, res, next) => {
       res.json({ msg: "The username and password do not match an account." });
     }
     if (!err && user) {
-      user.pic =
-        "https://www.theparadigmdev.com/relay/profile-pics/" +
-        user._id +
-        ".jpg";
       res.json(user);
       req.login(user, next);
     }
@@ -163,8 +159,6 @@ router.post("/update", async (req, res) => {
   );
 
   // user.people.requests.forEach(person => people_to_update.push(person._id))
-  user.pic =
-    "https://www.theparadigmdev.com/relay/profile-pics/" + user._id + ".jpg";
 
   res.json(user);
 });
@@ -192,10 +186,6 @@ router.get("/list", async (req, res) => {
       color: person.color,
       in: person.in,
       bio: person.bio,
-      pic:
-        "https://www.theparadigmdev.com/relay/profile-pics/" +
-        person._id +
-        ".jpg",
       _id: person._id,
       posts: person.posts,
     });
@@ -225,10 +215,6 @@ router.get("/:uid/info", async (req, res) => {
       color: Person.color,
       in: Person.in,
       bio: Person.bio,
-      pic:
-        "https://www.theparadigmdev.com/relay/profile-pics/" +
-        Person._id +
-        ".jpg",
       _id: Person._id,
     };
     res.json(data);
@@ -254,7 +240,6 @@ router.get("/:uid/chatroom/:id/:func", async (req, res) => {
           _id: User._id,
           username: User.username,
           color: User.color,
-          pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
         });
         User.chatrooms.push({
           name: Chatroom.name,
@@ -264,10 +249,6 @@ router.get("/:uid/chatroom/:id/:func", async (req, res) => {
         });
         await Chatroom.save();
         await User.save();
-        User.pic =
-          "https://www.theparadigmdev.com/relay/profile-pics/" +
-          User._id +
-          ".jpg";
         res.json(User);
       } else res.json({ error: "banned" });
       break;
@@ -278,10 +259,6 @@ router.get("/:uid/chatroom/:id/:func", async (req, res) => {
       });
       User.chatrooms[Index].remove();
       await User.save();
-      User.pic =
-        "https://www.theparadigmdev.com/relay/profile-pics/" +
-        User._id +
-        ".jpg";
       res.json(User);
       break;
   }
@@ -322,12 +299,10 @@ router.post("/:uid/pic", async (req, res) => {
         return img
           .resize(Jimp.AUTO, 150)
           .quality(50)
-          .write(__dirname + "/../files/profile-pics/" + User._id + ".jpg");
+          .write(__dirname + "/../files/profile-pics/" + User._id + ".png");
       })
       .catch((error) => console.error(error));
     // await fs.renameSync(file.path, __dirname + '/../files/profile-pics/' + User._id + '.jpg')
-    User.pic =
-      "https://www.theparadigmdev.com/relay/profile-pics/" + User._id + ".jpg";
     res.json(User);
   });
 });
@@ -351,7 +326,7 @@ router.get("/:uid/delete", async (req, res) => {
       }
       fs.rmdir(path, async (error) => {
         fs.unlink(
-          _path.join(__dirname + "/../files/profile-pics/" + User._id + ".jpg"),
+          _path.join(__dirname + "/../files/profile-pics/" + User._id + ".png"),
           async (error) => {
             if (error) console.error(error);
             var User = await UserModel.findOne({ _id: req.params.uid });
@@ -683,7 +658,6 @@ router.get("/:uid/people/send/:user", async (req, res) => {
     _id: req.params.user,
     username: Person.username,
     color: Person.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`,
     dm: "",
   });
   await User.save();
@@ -691,7 +665,6 @@ router.get("/:uid/people/send/:user", async (req, res) => {
     _id: req.params.uid,
     username: User.username,
     color: User.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
     dm: "",
   });
   await Person.save();
@@ -719,13 +692,11 @@ router.get("/:uid/people/request/:user/approve", async (req, res) => {
         _id: User._id,
         username: User.username,
         color: User.color,
-        pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
       },
       {
         _id: Person._id,
         username: Person.username,
         color: Person.color,
-        pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`,
       },
     ],
   });
@@ -736,14 +707,12 @@ router.get("/:uid/people/request/:user/approve", async (req, res) => {
     _id: req.params.user,
     username: Person.username,
     color: Person.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`,
     dm: new_dm._id,
   });
   await Person.people.approved.push({
     _id: req.params.uid,
     username: User.username,
     color: User.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
     dm: new_dm._id,
   });
 
@@ -853,7 +822,6 @@ router.get("/:uid/people/block/:user", async (req, res) => {
     _id: req.params.user,
     username: Person.username,
     color: Person.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${Person._id}.jpg`,
     dm: "",
   });
   await Person.people.blocked_by.push(req.params.uid);

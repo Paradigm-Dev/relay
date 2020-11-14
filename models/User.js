@@ -37,7 +37,6 @@ const FriendSchema = new mongoose.Schema({
   _id: String,
   username: String,
   color: String,
-  pic: String,
   liked_posts: [String],
   dm: String,
 });
@@ -47,8 +46,7 @@ const PostSchema = new mongoose.Schema({
   timestamp: String,
   likes: Number,
   reposts: Number,
-  file_path: String,
-  file_type: String,
+  files: Array,
 });
 
 const PreflightSchema = new mongoose.Schema({
@@ -60,7 +58,6 @@ const UserSchema = new mongoose.Schema({
   password: String,
   bio: String,
   color: String,
-  pic: String,
   chatrooms: [StoredChatroomSchema],
   people: {
     requests: [FriendSchema],
@@ -92,6 +89,7 @@ const UserSchema = new mongoose.Schema({
   },
   pinned_apps: [String],
   preflight: mongoose.Schema.Types.Mixed,
+  notifications: Array,
 });
 
 const UserModel = mongoose.model("user", UserSchema);

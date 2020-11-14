@@ -43,7 +43,6 @@ router.post("/chatroom/new", (req, res) => {
           _id: User._id,
           username: User.username,
           color: User.color,
-          pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
         });
         await User.save();
         await fs.mkdirSync(
@@ -177,7 +176,6 @@ router.get("/chatroom/:id/request/:user/approve", async (req, res) => {
     _id: User._id,
     username: User.username,
     color: User.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
   });
 
   await User.save();
@@ -230,7 +228,6 @@ router.get("/chatroom/:id/ban/:user", async (req, res) => {
     _id: User._id,
     username: User.username,
     color: User.color,
-    pic: `https://www.theparadigmdev.com/relay/profile-pics/${User._id}.jpg`,
   });
 
   await Chatroom.save();
