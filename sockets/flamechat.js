@@ -1,7 +1,9 @@
 const ChatroomModel = require("../models/Chatroom.js");
 const DMModel = require("../models/DM.js");
+const UserModel = require("../models/User.js");
 const mongoose = require("mongoose");
 const fs = require("fs");
+const webpush = require("web-push");
 
 module.exports = (io) => {
   ChatroomModel.find({}, (error, data) => {
@@ -55,7 +57,6 @@ module.exports = (io) => {
                 username: data.username,
                 user_id: data.user_id,
                 content: data.content,
-                pic: data.pic,
                 timestamp: data.timestamp,
                 edits: data.edits + 1,
                 type: data.type,
@@ -103,6 +104,22 @@ module.exports = (io) => {
               await dm_send.messages.push(data);
               await dm_send.save();
               namespace.emit("send", data);
+
+              const sender_index = dm_send.people.findIndex(
+                (person) => person._id == data.user_id
+              );
+              const recipient = await UserModel.findOne({
+                _id: sender_index == 0 ? dm_send.people[0] : dm_send.people[1],
+              });
+              const payload = JSON.stringify({
+                title: `DM from ${dm_send.people[sender_index].username}`,
+                body: data.content,
+              });
+              recipient.notifications.forEach((subscription) => {
+                webpush
+                  .sendNotification(subscription, payload)
+                  .catch((err) => console.error(err));
+              });
             });
             socket.on("delete", async (id) => {
               var dm_delete = await DMModel.findOne({ _id: dm._id });
@@ -132,7 +149,6 @@ module.exports = (io) => {
                 username: data.username,
                 user_id: data.user_id,
                 content: data.content,
-                pic: data.pic,
                 timestamp: data.timestamp,
                 edits: data.edits + 1,
                 type: data.type,

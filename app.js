@@ -111,6 +111,7 @@ app.use("/api/broadcast", require("./routes/broadcast.js"));
 app.use("/api/apollo", require("./routes/apollo.js"));
 app.use("/api/bugs", require("./routes/bugs.js"));
 app.use("/api/satellite", require("./routes/satellite.js"));
+app.use("/api/notifications", require("./routes/notifications.js"));
 app.use("/api", require("./routes/index.js"));
 
 // PARADIGM
