@@ -19,10 +19,11 @@ const BugModel = require("../models/Bug.js");
 
 // Register
 router.post("/register", (req, res) => {
-  UserModel.findOne({ username: req.body.username }).then((user) => {
+  UserModel.findOne({ username: req.body.username }).then(async (user) => {
     if (user) {
       res.json({ msg: "User already exists" });
     } else {
+      console.log(req.body.code);
       var newUser = new UserModel({
         username: req.body.username,
         password: req.body.password,
@@ -31,9 +32,10 @@ router.post("/register", (req, res) => {
         rights: req.body.rights,
         moonrocks: req.body.moonrocks,
         created: moment().format("dddd, MMMM Do YYYY [at] h:mm a"),
+        code: req.body.code,
       });
 
-      ApolloModel.findOneAndUpdate(
+      await ApolloModel.findOneAndUpdate(
         { code: req.body.code },
         { $set: { used: true, username: newUser.username, uid: newUser._id } }
       );

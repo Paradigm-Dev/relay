@@ -72,6 +72,7 @@ const UserSchema = new mongoose.Schema({
     asteroid: Boolean,
     patriot: Boolean,
     developer: Boolean,
+    apollo: Boolean,
   },
   moonrocks: Number,
   books: [UserBookSchema],
@@ -90,6 +91,7 @@ const UserSchema = new mongoose.Schema({
   pinned_apps: [String],
   preflight: mongoose.Schema.Types.Mixed,
   notifications: Array,
+  code: String,
 });
 
 const UserModel = mongoose.model("user", UserSchema);
