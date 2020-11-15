@@ -17,6 +17,7 @@ const https = require("https");
 const fs = require("fs");
 const moment = require("moment");
 const path = require("path");
+const compression = require("compression");
 
 const ConfigModel = require("./models/Config.js");
 const UserModel = require("./models/User.js");
@@ -71,19 +72,15 @@ app.use(
       "https://localhost:8080",
       "http://localhost:8080",
       "https://192.168.1.178:8080",
+      "http://192.168.1.178:8080",
       "app://.",
     ],
   })
 );
-
 app.use(bodyParser.json({ limit: "1000gb" }));
-
 require("./config/passport")(passport);
-
 app.use(express.urlencoded({ extended: true }));
-
 app.use(passport.initialize());
-
 app.use(
   session({
     secret: "secret",
@@ -91,6 +88,20 @@ app.use(
     saveUninitialized: true,
   })
 );
+app.use((req, res, next) => {
+  if (req.secure) {
+    next();
+  } else {
+    res.redirect("https://" + req.headers.host + req.url);
+  }
+});
+app.use(compression({ filter: shouldCompress }));
+function shouldCompress(req, res) {
+  if (req.headers["x-no-compression"]) {
+    return false;
+  }
+  return compression.filter(req, res);
+}
 
 // CAMPAIGN
 // app.use('/campaign', express.static(__dirname + '/campaign'))
