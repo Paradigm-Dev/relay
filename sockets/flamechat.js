@@ -4,6 +4,7 @@ const UserModel = require("../models/User.js");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const webpush = require("web-push");
+const moment = require("moment");
 
 module.exports = (io) => {
   ChatroomModel.find({}, (error, data) => {
@@ -24,6 +25,22 @@ module.exports = (io) => {
               await Chatroom.messages.push(data);
               await Chatroom.save();
               namespace.emit("send", data);
+              console.log(
+                "\x1b[32m",
+                "[  CHAT  ]",
+                "\x1b[31m",
+                moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[34m",
+                data.username,
+                "\x1b[0m",
+                "sent",
+                "\x1b[34m",
+                `"${data.content}"`,
+                "\x1b[0m",
+                "in",
+                "\x1b[34m",
+                `${chatroom.name} (${chatroom.id})`
+              );
             });
             socket.on("delete", async (id) => {
               var Chatroom = await ChatroomModel.findOne({ id: chatroom_id });
@@ -36,6 +53,22 @@ module.exports = (io) => {
               await Message.remove();
               await Chatroom.save();
               namespace.emit("delete", id);
+              console.log(
+                "\x1b[32m",
+                "[  CHAT  ]",
+                "\x1b[31m",
+                moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[34m",
+                Message.username,
+                "\x1b[0m",
+                "deleted",
+                "\x1b[34m",
+                `"${Message.content}"`,
+                "\x1b[0m",
+                "in",
+                "\x1b[34m",
+                `${chatroom.name} (${chatroom.id})`
+              );
             });
             socket.on("kill", () => {
               namespace.emit("kill");
@@ -65,6 +98,26 @@ module.exports = (io) => {
               await Chatroom.save();
               Data.oldID = oldID;
               namespace.emit("edit", Data);
+              console.log(
+                "\x1b[32m",
+                "[  CHAT  ]",
+                "\x1b[31m",
+                moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[34m",
+                data.username,
+                "\x1b[0m",
+                "edited",
+                "\x1b[34m",
+                `"${Message.content}"`,
+                "\x1b[0m",
+                "to",
+                "\x1b[34m",
+                `"${data.content}"`,
+                "\x1b[0m",
+                "in",
+                "\x1b[34m",
+                `${chatroom.name} (${chatroom.id})`
+              );
             });
             socket.on("typing", async (data) => {
               let exists = false;
@@ -81,7 +134,21 @@ module.exports = (io) => {
               }
               namespace.emit("typing", typers);
             });
-            socket.on("purge", () => namespace.emit("purge"));
+            socket.on("purge", () => {
+              namespace.emit("purge");
+              // console.log(
+              //   "\x1b[32m",
+              //   "[  CHAT  ]",
+              //   "\x1b[31m",
+              //   moment().format("MM/DD/YYYY, HH:MM:SS"),
+              //   "\x1b[34m",
+              //   data.username,
+              //   "\x1b[0m",
+              //   "purged all messages in",
+              //   "\x1b[34m",
+              //   `${chatroom.name} (${chatroom.id})`
+              // );
+            });
           });
       });
     }
@@ -123,6 +190,22 @@ module.exports = (io) => {
                   .sendNotification(subscription, payload)
                   .catch((err) => console.error(err));
               });
+              console.log(
+                "\x1b[32m",
+                "[  CHAT  ]",
+                "\x1b[31m",
+                moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[34m",
+                data.username,
+                "\x1b[0m",
+                "sent",
+                "\x1b[34m",
+                `"${data.content}"`,
+                "\x1b[0m",
+                "to",
+                "\x1b[34m",
+                recipient.username
+              );
             });
             socket.on("delete", async (id) => {
               var dm_delete = await DMModel.findOne({ _id: dm._id });
@@ -135,6 +218,32 @@ module.exports = (io) => {
               await Message.remove();
               await dm_delete.save();
               namespace.emit("delete", id);
+
+              const sender_index = dm_delete.people.findIndex(
+                (person) => person._id == data.user_id
+              );
+              const recipient = await UserModel.findOne({
+                _id:
+                  sender_index == 0
+                    ? dm_delete.people[1]._id
+                    : dm_delete.people[0]._id,
+              });
+              console.log(
+                "\x1b[32m",
+                "[  CHAT  ]",
+                "\x1b[31m",
+                moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[34m",
+                Message.username,
+                "\x1b[0m",
+                "deleted",
+                "\x1b[34m",
+                `"${Message.content}"`,
+                "\x1b[0m",
+                "from",
+                "\x1b[34m",
+                recipient.username
+              );
             });
             socket.on("kill", () => {
               namespace.emit("kill");
@@ -160,6 +269,36 @@ module.exports = (io) => {
               await dm_edit.save();
               Data.oldID = oldID;
               namespace.emit("edit", Data);
+
+              const sender_index = dm_edit.people.findIndex(
+                (person) => person._id == data.user_id
+              );
+              const recipient = await UserModel.findOne({
+                _id:
+                  sender_index == 0
+                    ? dm_edit.people[1]._id
+                    : dm_edit.people[0]._id,
+              });
+              console.log(
+                "\x1b[32m",
+                "[  CHAT  ]",
+                "\x1b[31m",
+                moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[34m",
+                data.username,
+                "\x1b[0m",
+                "edited",
+                "\x1b[34m",
+                `"${Message.content}"`,
+                "\x1b[0m",
+                "to",
+                "\x1b[34m",
+                `"${data.content}"`,
+                "\x1b[0m",
+                "with",
+                "\x1b[34m",
+                recipient.username
+              );
             });
             socket.on("typing", async (data) => {
               let exists = false;

@@ -51,6 +51,16 @@ router.post("/register", (req, res) => {
             .save()
             .then((user) => {
               res.json(user);
+              console.log(
+                "\x1b[32m",
+                "[  AUTH  ]",
+                "\x1b[31m",
+                moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[34m",
+                user.username,
+                "\x1b[0m",
+                "created their account"
+              );
             })
             .catch((err) => console.error(err));
         });
@@ -73,12 +83,6 @@ router.post("/signin", (req, res, next) => {
       req.login(user, next);
     }
   })(req, res, next);
-});
-
-// Sign out
-router.get("/signout", (req, res) => {
-  req.logout();
-  res.end();
 });
 
 router.post("/reset", async (req, res) => {

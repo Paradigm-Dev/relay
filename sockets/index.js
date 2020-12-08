@@ -12,7 +12,9 @@ module.exports = {
         "\x1b[31m",
         moment().format("MM/DD/YYYY, HH:MM:SS"),
         "\x1b[34m",
-        socket.id,
+        socket.handshake.address == "192.168.1.1"
+          ? "local network"
+          : socket.handshake.address,
         "\x1b[0m",
         "connected"
       );
@@ -101,7 +103,9 @@ module.exports = {
           "\x1b[31m",
           moment().format("MM/DD/YYYY, HH:MM:SS"),
           "\x1b[34m",
-          socket.id,
+          socket.handshake.address == "192.168.1.1"
+            ? "local network"
+            : socket.handshake.address,
           "\x1b[0m",
           "disconnected"
         );

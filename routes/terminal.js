@@ -23,6 +23,20 @@ router.get("/user/:username/strike", async (req, res) => {
   User.strikes = parseInt(User.strikes, 10) + 1;
   await User.save();
   res.end();
+  console.log(
+    "\x1b[32m",
+    "[  TERM  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[34m",
+    // data.username,
+    "\x1b[0m",
+    "awarded",
+    "\x1b[34m",
+    "1",
+    "\x1b[0m",
+    "strike"
+  );
 });
 
 router.get("/user/:username/delete", async (req, res) => {
