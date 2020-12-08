@@ -39,6 +39,7 @@ const FriendSchema = new mongoose.Schema({
   color: String,
   liked_posts: [String],
   dm: String,
+  subscribed: Boolean,
 });
 
 const PostSchema = new mongoose.Schema({
@@ -46,7 +47,7 @@ const PostSchema = new mongoose.Schema({
   timestamp: String,
   likes: Number,
   reposts: Number,
-  files: Array,
+  file: Object,
 });
 
 const PreflightSchema = new mongoose.Schema({
@@ -82,7 +83,6 @@ const UserSchema = new mongoose.Schema({
   banned: Boolean,
   strikes: Number,
   in: Boolean,
-  created: String,
   posts: [PostSchema],
   apollo_codes: {
     created: Number,

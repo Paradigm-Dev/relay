@@ -1,4 +1,5 @@
 const express = require("express");
+const webpush = require("web-push");
 const router = express.Router();
 
 const UserModel = require("../models/User.js");
@@ -7,10 +8,24 @@ router.post("/:uid/create", async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid });
   User.posts.unshift(req.body);
   await User.save();
-  res.json({
-    posts: User.posts,
-    post_id: User.posts[0]._id,
+
+  const recipients = await UserModel.find({
+    "people.approved._id": User._id,
+    "people.approved.subscribed": true,
   });
+  const payload = JSON.stringify({
+    title: "Paradigm Broadcast",
+    body: `New Broadcast from ${User.username}`,
+  });
+  recipients.forEach((recipient) => {
+    recipient.notifications.forEach((subscription) => {
+      webpush
+        .sendNotification(subscription, payload)
+        .catch((err) => console.error(err));
+    });
+  });
+
+  res.end();
 });
 
 router.put("/:uid/:post", async (req, res) => {
@@ -22,15 +37,12 @@ router.put("/:uid/:post", async (req, res) => {
     {
       $set: {
         "posts.$.content": req.body.content,
-        "posts.$.files": req.body.files,
+        "posts.$.file": req.body.file,
       },
     }
   );
 
-  res.json({
-    posts: await UserModel.findOne({ _id: req.params.uid }).posts,
-    post: req.body,
-  });
+  res.end();
 });
 
 router.get("/:uid/delete/:id", async (req, res) => {
@@ -40,7 +52,7 @@ router.get("/:uid/delete/:id", async (req, res) => {
   });
   User.posts[Index].remove();
   await User.save();
-  res.json(User.posts);
+  res.end();
 });
 
 router.get("/:uid/like/:profile/:post", async (req, res) => {
@@ -78,6 +90,24 @@ router.get("/:uid/unlike/:profile/:post", async (req, res) => {
     user: await UserModel.findOne({ _id: req.params.uid }),
     profile: await UserModel.findOne({ _id: req.params.profile }),
   });
+});
+
+router.put("/:uid/subscribe/:profile", async (req, res) => {
+  await UserModel.findOneAndUpdate(
+    { _id: req.params.uid, "people.approved._id": req.params.profile },
+    { $set: { "people.approved.$.subscribed": true } }
+  );
+  const user = await UserModel.findOne({ _id: req.params.uid });
+  res.json(user);
+});
+
+router.put("/:uid/unsubscribe/:profile", async (req, res) => {
+  await UserModel.findOneAndUpdate(
+    { _id: req.params.uid, "people.approved._id": req.params.profile },
+    { $set: { "people.approved.$.subscribed": false } }
+  );
+  const user = await UserModel.findOne({ _id: req.params.uid });
+  res.json(user);
 });
 
 module.exports = router;
