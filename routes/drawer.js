@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const formidable = require("formidable");
 const moment = require("moment");
+const prettyBytes = require("pretty-bytes");
 
 const UserModel = require("../models/User.js");
 
@@ -70,7 +71,7 @@ router.post("/:uid/upload/write", (req, res) => {
         User.files.push({
           name: req.body.title,
           type: "workshop/write",
-          size: stats.size + " B",
+          size: prettyBytes(stats.size),
           date: moment().format("MM/DD/YYYY [at] h:mm a"),
           path: `${req.body.title}.write.json`,
         });
@@ -96,7 +97,7 @@ router.post("/:uid/upload/sales", (req, res) => {
         User.files.push({
           name: req.body.title,
           type: "workshop/sales",
-          size: stats.size + " B",
+          size: prettyBytes(stats.size),
           date: moment().format("MM/DD/YYYY [at] h:mm a"),
           path: `${req.body.title}.sales.json`,
         });
@@ -122,7 +123,7 @@ router.post("/:uid/upload/intel", (req, res) => {
         User.files.push({
           name: req.body.title,
           type: "workshop/intel",
-          size: stats.size + " B",
+          size: prettyBytes(stats.size),
           date: moment().format("MM/DD/YYYY [at] h:mm a"),
           path: `${req.body.title}.intel.json`,
         });
@@ -150,7 +151,7 @@ router.post("/:uid/upload", async (req, res) => {
         User.files.push({
           name: files[i].name.slice(0, files[i].name.lastIndexOf(".")),
           type: files[i].type,
-          size: files[i].size + " B",
+          size: prettyBytes(files[i].size),
           date: moment().format("MM/DD/YYYY [at] h:mm a"),
           path: files[i].name,
         });
