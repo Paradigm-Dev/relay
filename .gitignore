@@ -19,3 +19,5 @@ server.pem
 .DS_Store
 /.deno_plugins
 config/vapid.js
+patriot.js
+Intel.js

@@ -55,13 +55,11 @@ module.exports = {
       });
 
       socket.on("logout", async (data) => {
-        var User = await UserModel.findOne({ username: data.username });
         var index = connections.findIndex((connection) => {
-          return connection.username == User.username;
+          return connection._id == data._id;
         });
         connections.splice(index, 1);
-        User.in = false;
-        await User.save();
+        await UserModel.findByIdAndUpdate(data._id, { $set: { in: false } });
         console.log(
           "\x1b[32m",
           "[  AUTH  ]",
