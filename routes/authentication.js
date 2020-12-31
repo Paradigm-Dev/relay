@@ -44,7 +44,11 @@ function handleErrors(err) {
 }
 
 async function signIn(username, password) {
-  const user = await UserModel.findOneAndUpdate({ username }, { in: true });
+  const user = await UserModel.findOneAndUpdate(
+    { username },
+    { in: true },
+    { new: true }
+  );
   if (user) {
     const auth = await bcrypt.compare(password, user.password);
     if (auth) {
@@ -56,16 +60,17 @@ async function signIn(username, password) {
 }
 
 router.post("/signin", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, sticky } = req.body;
 
   try {
     const user = await signIn(username, password);
-    const token = createToken(user._id);
-    res.cookie("jwt", token, {
-      httpOnly: true,
-      maxAge: maxAge * 1000,
-      domain: "http://localhost:8080",
-    });
+    if (sticky) {
+      const token = createToken(user._id);
+      console.log(token);
+      res.cookie("jwt", token, {
+        maxAge: maxAge * 1000,
+      });
+    }
     res.status(200).json(user);
   } catch (err) {
     const errors = handleErrors(err);
@@ -125,9 +130,37 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-router.get("/signout", (req, res) => {
+router.post("/signout", async (req, res) => {
+  await UserModel.findByIdAndUpdate(req.body._id, { in: false });
   res.cookie("jwt", "", { maxAge: 1 });
   res.redirect("/");
 });
+
+router.get("/verify", async (req, res) => {
+  const token = req.cookies.jwt;
+  if (token) {
+    jwt.verify(token, jwt_secret, async (err, decodedToken) => {
+      if (err) {
+        res.cookie("jwt", "", { maxAge: 1 });
+        res.statusCode(403);
+      } else {
+        const user = await UserModel.findById(decodedToken.id);
+        if (user)
+          res.json({
+            valid: true,
+            user,
+          });
+      }
+    });
+  } else {
+    res.json({ valid: false });
+  }
+});
+
+// router.post("/regen", async (req, res) => {
+//   const salt = await bcrypt.genSalt();
+//   const password = await bcrypt.hash(req.body.password, salt);
+//   res.json({ password });
+// });
 
 module.exports = router;

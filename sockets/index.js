@@ -29,29 +29,57 @@ module.exports = {
         }
       }, 2000);
 
-      socket.on("login", async (data) => {
-        data.socket = socket;
-        connections.push(data);
-        var User = await UserModel.findOne({ username: data.username });
-        User.in = true;
-        await User.save();
-        console.log(
-          "\x1b[32m",
-          "[  AUTH  ]",
-          "\x1b[31m",
-          moment().format("MM/DD/YYYY, HH:MM:SS"),
-          "\x1b[34m",
-          data.username,
-          "\x1b[0m",
-          "logged in"
-        );
-        setInterval(async () => {
-          var newUser = await UserModel.findOne({ username: data.username });
-          if (newUser != User) {
-            User = newUser;
-            socket.emit("user", User);
-          }
-        }, 2000);
+      socket.on("login", async (user) => {
+        if (typeof user == "string") {
+          let data = {
+            username: user,
+          };
+          data.socket = socket;
+          connections.push(data);
+          let User = await UserModel.findOne({ username: user });
+          User.in = true;
+          await User.save();
+          console.log(
+            "\x1b[32m",
+            "[  AUTH  ]",
+            "\x1b[31m",
+            moment().format("MM/DD/YYYY, HH:MM:SS"),
+            "\x1b[34m",
+            user,
+            "\x1b[0m",
+            "logged in"
+          );
+          setInterval(async () => {
+            var newUser = await UserModel.findOne({ username: user });
+            if (newUser != User) {
+              User = newUser;
+              socket.emit("user", User);
+            }
+          }, 2000);
+        } else {
+          user.socket = socket;
+          connections.push(user);
+          var User = await UserModel.findOne({ username: user.username });
+          User.in = true;
+          await User.save();
+          console.log(
+            "\x1b[32m",
+            "[  AUTH  ]",
+            "\x1b[31m",
+            moment().format("MM/DD/YYYY, HH:MM:SS"),
+            "\x1b[34m",
+            user.username,
+            "\x1b[0m",
+            "logged in"
+          );
+          setInterval(async () => {
+            var newUser = await UserModel.findOne({ username: user.username });
+            if (newUser != User) {
+              User = newUser;
+              socket.emit("user", User);
+            }
+          }, 2000);
+        }
       });
 
       socket.on("logout", async (data) => {
