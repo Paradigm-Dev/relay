@@ -56,7 +56,9 @@ const io = socket(server, {
 });
 
 require("./sockets/index.js").socket(io);
+// TODO(Delete flamechat api endpoints)
 require("./sockets/flamechat.js")(io);
+require("./sockets/wire.js")(io);
 require("./sockets/terminal.js")(io);
 require("./sockets/transmission.js")(io);
 
@@ -118,7 +120,9 @@ app.use("/relay/movies", express.static("/mnt/movies"));
 
 // ROUTES
 app.use("/api/users", require("./routes/users.js"));
+// TODO(Delete flamechat api endpoints)
 app.use("/api/flamechat", require("./routes/flamechat.js"));
+app.use("/api/wire", require("./routes/wire.js"));
 app.use("/api/paradox", require("./routes/paradox.js"));
 app.use("/api/media", require("./routes/media.js"));
 app.use("/api/drawer", require("./routes/drawer.js"));

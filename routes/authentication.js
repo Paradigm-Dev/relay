@@ -64,14 +64,14 @@ router.post("/signin", async (req, res) => {
 
   try {
     const user = await signIn(username, password);
+    let token;
     if (sticky) {
-      const token = createToken(user._id);
-      console.log(token);
+      token = createToken(user._id);
       res.cookie("jwt", token, {
         maxAge: maxAge * 1000,
       });
     }
-    res.status(200).json(user);
+    res.status(200).json({ user, jwt: token });
   } catch (err) {
     const errors = handleErrors(err);
     res.status(400).json({ errors });
@@ -138,6 +138,27 @@ router.post("/signout", async (req, res) => {
 
 router.get("/verify", async (req, res) => {
   const token = req.cookies.jwt;
+  if (token) {
+    jwt.verify(token, jwt_secret, async (err, decodedToken) => {
+      if (err) {
+        res.cookie("jwt", "", { maxAge: 1 });
+        res.statusCode(403);
+      } else {
+        const user = await UserModel.findById(decodedToken.id);
+        if (user)
+          res.json({
+            valid: true,
+            user,
+          });
+      }
+    });
+  } else {
+    res.json({ valid: false });
+  }
+});
+
+router.post("/verify", async (req, res) => {
+  const token = req.body.jwt;
   if (token) {
     jwt.verify(token, jwt_secret, async (err, decodedToken) => {
       if (err) {
