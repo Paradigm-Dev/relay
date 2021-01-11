@@ -302,13 +302,13 @@ router.post("/:uid/pic", async (req, res) => {
     file = files["files[0]"];
     await Jimp.read(file.path)
       .then((img) => {
+        fs.unlink(file.path);
         return img
-          .resize(Jimp.AUTO, 150)
+          .cover(150, 150)
           .quality(50)
           .write(__dirname + "/../files/profile-pics/" + User._id + ".png");
       })
       .catch((error) => console.error(error));
-    // await fs.renameSync(file.path, __dirname + '/../files/profile-pics/' + User._id + '.jpg')
     res.json(User);
   });
 });
