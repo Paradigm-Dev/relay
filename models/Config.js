@@ -11,6 +11,15 @@ const DownloadsSchema = new mongoose.Schema({
   },
 });
 
+const DownloadSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  icon: String,
+  github: String,
+  win: String,
+  mac: String,
+});
+
 const ConfigSchema = new mongoose.Schema(
   {
     auth: {
@@ -22,7 +31,8 @@ const ConfigSchema = new mongoose.Schema(
     apps: mongoose.Mixed,
     find: String,
     banned: [String],
-    downloads: DownloadsSchema,
+    download: DownloadsSchema,
+    downloads: [DownloadSchema],
     landing: {
       date: String,
       title: String,

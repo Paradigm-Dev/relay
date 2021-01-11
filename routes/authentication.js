@@ -130,8 +130,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-router.post("/signout", async (req, res) => {
-  await UserModel.findByIdAndUpdate(req.body._id, { in: false });
+router.get("/signout", (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 });
   res.redirect("/");
 });

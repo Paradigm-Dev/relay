@@ -27,6 +27,7 @@ function getUserData(req, res, next) {
   if (token) {
     jwt.verify(token, jwt_secret, async (err, decodedToken) => {
       if (err) {
+        console.log(err);
         req.user = null;
         next();
       } else {
