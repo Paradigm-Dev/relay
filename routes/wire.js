@@ -45,7 +45,10 @@ router.post("/chatroom/new", (req, res) => {
           color: User.color,
         });
         await User.save();
-        await fs.mkdirSync(__dirname + `/../files/wire/chatroom/${data.id}`);
+        await fs.mkdirSync(
+          // TODO(change to /files/wire)
+          __dirname + `/../files/flamechat/chatroom/${data.id}`
+        );
         res.json(data);
       }
     });
@@ -59,7 +62,8 @@ router.post("/chatroom/:id/file", async (req, res) => {
 
   const form = formidable({
     multiples: false,
-    uploadDir: __dirname + "/../files/wire/chatroom/" + Chatroom.id,
+    // TODO(change to /files/wire)
+    uploadDir: __dirname + "/../files/flamechat/chatroom/" + Chatroom.id,
     keepExtensions: true,
   });
 
@@ -69,7 +73,13 @@ router.post("/chatroom/:id/file", async (req, res) => {
     file = files.file;
     await fs.renameSync(
       file.path,
-      __dirname + "/../files/wire/chatroom/" + Chatroom.id + "/" + file.name
+      __dirname +
+        // TODO(change to /files/wire)
+
+        "/../files/flamechat/chatroom/" +
+        Chatroom.id +
+        "/" +
+        file.name
     );
     res.end();
   });
@@ -82,7 +92,8 @@ router.post("/dm/:id/file", async (req, res) => {
 
   const form = formidable({
     multiples: false,
-    uploadDir: __dirname + "/../files/wire/dm/" + DM_data._id,
+    // TODO(change to /files/wire)
+    uploadDir: __dirname + "/../files/flamechat/dm/" + DM_data._id,
     keepExtensions: true,
   });
 
@@ -92,7 +103,8 @@ router.post("/dm/:id/file", async (req, res) => {
     file = files.file;
     await fs.renameSync(
       file.path,
-      __dirname + "/../files/wire/dm/" + DM_data._id + "/" + file.name
+      // TODO(change to /files/wire)
+      __dirname + "/../files/flamechat/dm/" + DM_data._id + "/" + file.name
     );
     res.end();
   });
@@ -122,7 +134,8 @@ router.get("/chatroom/:id/delete", async (req, res) => {
       });
     });
   }
-  deleteFolderRecursive(__dirname + "/../files/wire/" + Chatroom._id);
+  // TODO(change to /files/wire)
+  deleteFolderRecursive(__dirname + "/../files/flamechat/" + Chatroom._id);
 });
 
 router.get("/chatroom/:id/remove/:user", async (req, res) => {

@@ -185,11 +185,13 @@ module.exports = (io) => {
                 title: `DM from ${dm_send.people[sender_index].username}`,
                 body: data.content,
               });
-              recipient.notifications.forEach((subscription) => {
-                webpush
-                  .sendNotification(subscription, payload)
-                  .catch((err) => console.error(err));
-              });
+              if (recipient.notifications.length > 0) {
+                recipient.notifications.forEach((subscription) => {
+                  webpush
+                    .sendNotification(subscription, payload)
+                    .catch((err) => console.error(err));
+                });
+              }
               console.log(
                 "\x1b[32m",
                 "[  CHAT  ]",
