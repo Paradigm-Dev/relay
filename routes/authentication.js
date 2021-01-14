@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const UserModel = require("../models/User");
 const { jwt_secret } = require("../config/vapid");
+const moment = require("moment");
 
 const router = Router();
 
@@ -64,12 +65,13 @@ router.post("/signin", async (req, res) => {
 
   try {
     const user = await signIn(username, password);
-    let token;
+    const token = createToken(user._id);
     if (sticky) {
-      token = createToken(user._id);
       res.cookie("jwt", token, {
         maxAge: maxAge * 1000,
       });
+    } else {
+      res.cookie("jwt", token);
     }
     res.status(200).json({ user, jwt: token });
   } catch (err) {
@@ -144,11 +146,23 @@ router.get("/verify", async (req, res) => {
         res.statusCode(403);
       } else {
         const user = await UserModel.findById(decodedToken.id);
-        if (user)
+        if (user) {
+          console.log(
+            "\x1b[32m",
+            "[  AUTH  ]",
+            "\x1b[31m",
+            moment().format("MM/DD/YYYY, HH:MM:SS"),
+            "\x1b[34m",
+            user.username,
+            "\x1b[0m",
+            "token verified"
+          );
+
           res.json({
             valid: true,
             user,
           });
+        }
       }
     });
   } else {

@@ -44,7 +44,8 @@ const FriendSchema = new mongoose.Schema({
 
 const PostSchema = new mongoose.Schema({
   content: String,
-  timestamp: String,
+  timestamp: Number,
+  timestamp_formatted: String,
   likes: Number,
   reposts: Number,
   file: Object,
@@ -80,7 +81,6 @@ const UserSchema = new mongoose.Schema({
   movies: [UserMovieSchema],
   music: [UserMusicSchema],
   files: [FileSchema],
-  banned: Boolean,
   strikes: Number,
   in: Boolean,
   posts: [PostSchema],

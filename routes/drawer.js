@@ -8,17 +8,15 @@ const prettyBytes = require("pretty-bytes");
 
 const UserModel = require("../models/User.js");
 
-router.get("/:uid/download/:id.*", async (req, res) => {
+router.get("/:uid/download/:id", async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid });
   var File = await User.files.id(req.params.id);
-  console.log(File);
   res.download(path.join("/mnt/drawer/" + req.params.uid + "/" + File.path));
 });
 
-router.get("/:uid/get/:id.*", async (req, res) => {
+router.get("/:uid/get/:id", async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid });
   var File = await User.files.id(req.params.id);
-  console.log(File);
   res.sendFile(path.join("/mnt/drawer/" + req.params.uid + "/" + File.path));
 });
 

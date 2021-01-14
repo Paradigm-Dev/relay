@@ -118,11 +118,22 @@ module.exports = {
         });
         if (index > -1) {
           var data = connections[index];
+          console.log(
+            "\x1b[32m",
+            "[  AUTH  ]",
+            "\x1b[31m",
+            moment().format("MM/DD/YYYY, HH:MM:SS"),
+            "\x1b[34m",
+            data.username,
+            "\x1b[0m",
+            "disconnected"
+          );
           connections.splice(index, 1);
           var User = await UserModel.findOne({ username: data.username });
           User.in = false;
           await User.save();
         }
+
         console.log(
           "\x1b[32m",
           "[ SOCKET ]",

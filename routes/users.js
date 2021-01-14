@@ -104,11 +104,11 @@ router.post("/reset", async (req, res) => {
 router.post("/update", async (req, res) => {
   var user = await UserModel.findOne({ username: req.body.old });
 
-  if (req.body.username) user.username = req.body.username;
   if (req.body.bio) user.bio = req.body.bio;
   if (req.body.color) user.color = req.body.color;
   if (req.body.pinned_apps) user.pinned_apps = req.body.pinned_apps;
   if (req.body.chatrooms) user.chatrooms = req.body.chatrooms;
+  if (req.body.friends) user.people.approved = req.body.friends;
 
   await user.save();
 
@@ -118,7 +118,6 @@ router.post("/update", async (req, res) => {
     var Index = Person.people.requests.findIndex((request) => {
       return request._id == user._id;
     });
-    Person.people.requests[Index].username = req.body.username;
     Person.people.requests[Index]._id = user._id;
     Person.people.requests[Index].color = req.body.color;
     await Person.save();
@@ -129,7 +128,6 @@ router.post("/update", async (req, res) => {
     var Index = Person.people.sent.findIndex((request) => {
       return request._id == user._id;
     });
-    Person.people.sent[Index].username = req.body.username;
     Person.people.sent[Index]._id = user._id;
     Person.people.sent[Index].color = req.body.color;
     await Person.save();
@@ -142,7 +140,6 @@ router.post("/update", async (req, res) => {
     var Index = Person.people.approved.findIndex((request) => {
       return request._id == user._id;
     });
-    Person.people.approved[Index].username = req.body.username;
     Person.people.approved[Index]._id = user._id;
     Person.people.approved[Index].color = req.body.color;
     await Person.save();
@@ -150,19 +147,9 @@ router.post("/update", async (req, res) => {
     var DM_index = DM.people.findIndex((person) => {
       return person._id == user._id;
     });
-    DM.people[DM_index].username = req.body.username;
     DM.people[DM_index].color = req.body.color;
     DM.save();
   });
-
-  await ApolloModel.findOneAndUpdate(
-    { uid: user._id },
-    { $set: { username: req.body.username } }
-  );
-  await BugModel.updateMany(
-    { uid: user._id },
-    { $set: { username: req.body.username } }
-  );
 
   // user.people.requests.forEach(person => people_to_update.push(person._id))
 
@@ -284,7 +271,6 @@ router.get("/:uid/moonrocks/:diff", (req, res) => {
 
 // Post profile pic
 router.post("/:uid/pic", async (req, res) => {
-  var User = await UserModel.findOne({ _id: req.params.uid });
   var file;
 
   const form = formidable({
@@ -300,16 +286,18 @@ router.post("/:uid/pic", async (req, res) => {
     }
 
     file = files["files[0]"];
-    await Jimp.read(file.path)
+    Jimp.read(file.path)
       .then((img) => {
-        fs.unlink(file.path);
+        fs.unlinkSync(file.path);
+        res.end();
         return img
           .cover(150, 150)
           .quality(50)
-          .write(__dirname + "/../files/profile-pics/" + User._id + ".png");
+          .write(
+            __dirname + "/../files/profile-pics/" + req.params.uid + ".png"
+          );
       })
       .catch((error) => console.error(error));
-    res.json(User);
   });
 });
 
@@ -835,7 +823,7 @@ router.get("/:uid/people/block/:user", async (req, res) => {
   await User.save();
   await Person.save();
 
-  res.json(User.people);
+  res.json(User);
 });
 
 router.get("/:uid/people/unblock/:user", async (req, res) => {

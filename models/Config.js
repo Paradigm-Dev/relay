@@ -28,7 +28,7 @@ const ConfigSchema = new mongoose.Schema(
       recover: Boolean,
     },
     shutdown: Boolean,
-    apps: mongoose.Mixed,
+    apps: Object,
     find: String,
     banned: [String],
     download: DownloadsSchema,
