@@ -4,6 +4,24 @@ const router = express.Router();
 
 const UserModel = require("../models/User.js");
 
+router.get("/:uid", async (req, res) => {
+  const User = await UserModel.findById(req.params.uid);
+  let all_posts = [];
+
+  for (friend of User.people.approved) {
+    const data = await UserModel.findById(friend._id);
+    const posts = JSON.parse(JSON.stringify(data.posts));
+    posts.forEach((post) => {
+      post.uid = data._id;
+      post.color = data.color;
+      post.username = data.username;
+      all_posts.push(post);
+    });
+  }
+
+  res.json(all_posts.sort((a, b) => b.timestamp - a.timestamp));
+});
+
 router.post("/:uid/create", async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid });
   User.posts.unshift(req.body);
@@ -56,18 +74,30 @@ router.get("/:uid/delete/:id", async (req, res) => {
 });
 
 router.get("/:uid/like/:profile/:post", async (req, res) => {
-  var User = await UserModel.findOneAndUpdate(
+  await UserModel.findOneAndUpdate(
     { _id: req.params.uid, "people.approved._id": req.params.profile },
     { $push: { "people.approved.$.liked_posts": req.params.post } }
   );
-  var Profile = await UserModel.findOneAndUpdate(
+  await UserModel.findOneAndUpdate(
     { _id: req.params.profile, "posts._id": req.params.post },
     { $inc: { "posts.$.likes": 1 } }
   );
-  res.json({
-    user: await UserModel.findOne({ _id: req.params.uid }),
-    profile: await UserModel.findOne({ _id: req.params.profile }),
-  });
+
+  const User = await UserModel.findById(req.params.uid);
+  let all_posts = [];
+
+  for (friend of User.people.approved) {
+    const data = await UserModel.findById(friend._id);
+    const posts = JSON.parse(JSON.stringify(data.posts));
+    posts.forEach((post) => {
+      post.uid = data._id;
+      post.color = data.color;
+      post.username = data.username;
+      all_posts.push(post);
+    });
+  }
+
+  res.json(all_posts.sort((a, b) => b.timestamp - a.timestamp));
 });
 
 router.get("/:uid/unlike/:profile/:post", async (req, res) => {
@@ -82,14 +112,26 @@ router.get("/:uid/unlike/:profile/:post", async (req, res) => {
   );
   await User.people.approved[u_index].liked_posts.splice(post_index, 1);
   await User.save();
-  var Profile = await UserModel.findOneAndUpdate(
+  await UserModel.findOneAndUpdate(
     { _id: req.params.profile, "posts._id": req.params.post },
     { $inc: { "posts.$.likes": -1 } }
   );
-  res.json({
-    user: await UserModel.findOne({ _id: req.params.uid }),
-    profile: await UserModel.findOne({ _id: req.params.profile }),
-  });
+
+  User = await UserModel.findById(req.params.uid);
+  let all_posts = [];
+
+  for (friend of User.people.approved) {
+    const data = await UserModel.findById(friend._id);
+    const posts = JSON.parse(JSON.stringify(data.posts));
+    posts.forEach((post) => {
+      post.uid = data._id;
+      post.color = data.color;
+      post.username = data.username;
+      all_posts.push(post);
+    });
+  }
+
+  res.json(all_posts.sort((a, b) => b.timestamp - a.timestamp));
 });
 
 router.put("/:uid/subscribe/:profile", async (req, res) => {

@@ -18,6 +18,7 @@ const https = require("https");
 const fs = require("fs");
 const moment = require("moment");
 const compression = require("compression");
+const history = require("connect-history-api-fallback");
 const { getUserData } = require("./middleware/authentication");
 
 const UserModel = require("./models/User.js");
@@ -87,6 +88,7 @@ app.use(cookieParser());
 require("./config/passport")(passport);
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
+app.use(history());
 app.use(
   session({
     secret: "secret",
@@ -134,6 +136,8 @@ app.use("/api/bugs", require("./routes/bugs.js"));
 app.use("/api/satellite", require("./routes/satellite.js"));
 app.use("/api/notifications", require("./routes/notifications.js"));
 app.use("/api/authentication", require("./routes/authentication.js"));
+app.use("/api/parlay", require("./routes/parlay.js"));
+app.use("/api/people", require("./routes/people.js"));
 app.use("/api", require("./routes/index.js"));
 
 // PARADIGM
