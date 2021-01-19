@@ -26,6 +26,12 @@ router.post("/", async (req, res) => {
   res.json(await ThreadModel.create(req.body));
 });
 
+// DELETE THREAD
+router.delete("/:id", async (req, res) => {
+  await ThreadModel.findByIdAndDelete(req.params.id);
+  res.end();
+});
+
 // NEW REPLY
 router.put("/:id", async (req, res) => {
   await ThreadModel.findByIdAndUpdate(req.params.id, {
@@ -39,6 +45,14 @@ router.put("/:id", async (req, res) => {
   res.end();
 });
 
+// DELETE REPLY
+router.delete("/:thread/:reply", async (req, res) => {
+  await ThreadModel.findByIdAndUpdate(req.params.thread, {
+    $pull: { replies: { _id: req.params.reply } },
+  });
+  res.end();
+});
+
 // NEW SUBREPLY
 router.put("/:id/:subid", async (req, res) => {
   const Thread = await ThreadModel.findById(req.params.id);
@@ -48,28 +62,14 @@ router.put("/:id/:subid", async (req, res) => {
   res.end();
 });
 
-// router.put("/:uid/:post", async (req, res) => {
-//   await UserModel.findOneAndUpdate(
-//     { _id: req.params.uid, "posts._id": req.params.post },
-//     {
-//       $set: {
-//         "posts.$.content": req.body.content,
-//         "posts.$.file": req.body.file,
-//       },
-//     }
-//   );
-
-//   res.end();
-// });
-
-// router.get("/:uid/delete/:id", async (req, res) => {
-//   var User = await UserModel.findOne({ _id: req.params.uid });
-//   var Index = await User.posts.findIndex((post) => {
-//     return post._id == req.params.id;
-//   });
-//   User.posts[Index].remove();
-//   await User.save();
-//   res.end();
-// });
+// DELETE SUBREPLY
+router.delete("/:thread/:reply/:subreply", async (req, res) => {
+  const thread = await ThreadModel.findById(req.params.thread);
+  const reply = thread.find((item) => item._id == req.params.reply);
+  const subreply = reply.findIndex((item) => item._id == req.params.subreply);
+  reply.replies.splice(subreply, 1);
+  await thread.save();
+  res.end();
+});
 
 module.exports = router;
