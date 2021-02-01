@@ -1,8 +1,7 @@
 const express = require("express");
-const webpush = require("web-push");
+const mongoose = require("mongoose");
 const router = express.Router();
 
-const UserModel = require("../models/User.js");
 const ThreadModel = require("../models/Thread.js");
 
 // GET ALL THREADS
@@ -57,16 +56,20 @@ router.delete("/:thread/:reply", async (req, res) => {
 router.put("/:id/:subid", async (req, res) => {
   const Thread = await ThreadModel.findById(req.params.id);
   const Reply = Thread.replies.id(req.params.subid);
+  const _id = mongoose.Types.ObjectId();
+  req.body._id = _id;
   Reply.replies.unshift(req.body);
   await Thread.save();
-  res.end();
+  res.json({ _id });
 });
 
 // DELETE SUBREPLY
 router.delete("/:thread/:reply/:subreply", async (req, res) => {
   const thread = await ThreadModel.findById(req.params.thread);
-  const reply = thread.find((item) => item._id == req.params.reply);
-  const subreply = reply.findIndex((item) => item._id == req.params.subreply);
+  const reply = thread.replies.find((item) => item._id == req.params.reply);
+  const subreply = reply.replies.findIndex(
+    (item) => item._id == req.params.subreply
+  );
   reply.replies.splice(subreply, 1);
   await thread.save();
   res.end();

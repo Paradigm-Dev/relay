@@ -39,11 +39,6 @@ router.get("/user/:username/strike", async (req, res) => {
   );
 });
 
-router.get("/user/:username/delete", async (req, res) => {
-  await UserModel.findOneAndDelete({ username: req.params.username });
-  res.end();
-});
-
 router.get("/list/users", async (req, res) => {
   var Users = await UserModel.find({});
   var users = [];
