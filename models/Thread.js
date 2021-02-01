@@ -7,6 +7,7 @@ const ThreadUserSchema = new mongoose.Schema({
 });
 
 const ReplySchema = new mongoose.Schema({
+  _id: mongoose.Types.ObjectId,
   attachment: Object,
   content: String,
   timestamp: Number,

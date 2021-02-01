@@ -1,16 +1,5 @@
 const mongoose = require("mongoose");
 
-const DownloadsSchema = new mongoose.Schema({
-  capture: {
-    win: String,
-    mac: String,
-  },
-  intelligence: {
-    win: String,
-    mac: String,
-  },
-});
-
 const DownloadSchema = new mongoose.Schema({
   title: String,
   description: String,
@@ -31,7 +20,6 @@ const ConfigSchema = new mongoose.Schema(
     apps: Object,
     find: String,
     banned: [String],
-    download: DownloadsSchema,
     downloads: [DownloadSchema],
     landing: {
       date: String,

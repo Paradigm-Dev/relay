@@ -22,10 +22,7 @@ router.put("/:id", async (req, res) => {
     { _id: req.params.id },
     { $set: { fixed: true } }
   );
-  await UserModel.findOneAndUpdate(
-    { _id: Bug.uid },
-    { $inc: { moonrocks: +15 } }
-  );
+  await UserModel.findOneAndUpdate({ _id: Bug.uid });
 
   const Bugs = await BugModel.find({});
   res.json(Bugs);
@@ -36,10 +33,7 @@ router.get("/:id", async (req, res) => {
     { _id: req.params.id },
     { $set: { fixed: false } }
   );
-  await UserModel.findOneAndUpdate(
-    { _id: Bug.uid },
-    { $inc: { moonrocks: -15 } }
-  );
+  await UserModel.findOneAndUpdate({ _id: Bug.uid });
 
   const Bugs = await BugModel.find({});
   res.json(Bugs);
