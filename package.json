@@ -25,6 +25,7 @@
     "convert-units": "^2.3.4",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
+    "cron": "^1.8.2",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "formidable": "^1.2.2",
