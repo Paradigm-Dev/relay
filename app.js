@@ -24,7 +24,7 @@ const { getUserData } = require("./middleware/authentication");
 const UserModel = require("./models/User.js");
 
 const port = 443;
-const host = "192.168.1.247";
+const host = "192.168.1.7";
 const app = express();
 
 const server = https
@@ -45,7 +45,7 @@ console.log(
   "[ SERVER ]",
   "\x1b[31m",
   moment().format("MM/DD/YYYY, HH:MM:SS"),
-  "\x1b[34m",
+  "\x1b[33m",
   `https://${host}:${port}`,
   "\x1b[0m",
   "listening"
@@ -57,8 +57,6 @@ const io = socket(server, {
 });
 
 require("./sockets/index.js").socket(io);
-// TODO(Delete flamechat api endpoints)
-require("./sockets/flamechat.js")(io);
 require("./sockets/wire.js")(io);
 require("./sockets/terminal.js")(io);
 require("./sockets/transmission.js")(io);
@@ -85,7 +83,6 @@ app.use(
 );
 app.use(bodyParser.json({ limit: "1000gb" }));
 app.use(cookieParser());
-require("./config/passport")(passport);
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(history());
@@ -118,12 +115,9 @@ app.get("*", getUserData);
 
 // RELAY
 app.use("/relay", express.static(__dirname + "/files"));
-app.use("/relay/movies", express.static("/mnt/movies"));
 
 // ROUTES
 app.use("/api/users", require("./routes/users.js"));
-// TODO(Delete flamechat api endpoints)
-app.use("/api/flamechat", require("./routes/flamechat.js"));
 app.use("/api/wire", require("./routes/wire.js"));
 app.use("/api/paradox", require("./routes/paradox.js"));
 app.use("/api/media", require("./routes/media.js"));
@@ -136,7 +130,7 @@ app.use("/api/bugs", require("./routes/bugs.js"));
 app.use("/api/satellite", require("./routes/satellite.js"));
 app.use("/api/notifications", require("./routes/notifications.js"));
 app.use("/api/authentication", require("./routes/authentication.js"));
-app.use("/api/parlay", require("./routes/parlay.js"));
+app.use("/api/forum", require("./routes/forum.js"));
 app.use("/api/people", require("./routes/people.js"));
 app.use("/api", require("./routes/index.js"));
 
@@ -155,7 +149,7 @@ mongoose
       "[   DB   ]",
       "\x1b[31m",
       moment().format("MM/DD/YYYY, HH:MM:SS"),
-      "\x1b[34m",
+      "\x1b[33m",
       `mongodb://${host}:27017`,
       "\x1b[0m",
       "connected"
@@ -166,18 +160,6 @@ mongoose
 async function fixUsers() {
   let in_users = [];
   in_users = await UserModel.find({ in: true });
-  console.log(
-    "\x1b[32m",
-    "[  AUTH  ]",
-    "\x1b[31m",
-    moment().format("MM/DD/YYYY, HH:MM:SS"),
-    "\x1b[34m",
-    in_users.length.toString(),
-    "\x1b[0m",
-    in_users.length == 1
-      ? "incorrectly logged in user"
-      : "incorrectly logged in users"
-  );
   if (in_users.length > 0) {
     await Promise.all(
       in_users.map(async (User) => {
@@ -189,3 +171,5 @@ async function fixUsers() {
 }
 
 fixUsers();
+
+require("./cron.js").initCron();

@@ -9,14 +9,51 @@ const prettyBytes = require("pretty-bytes");
 const UserModel = require("../models/User.js");
 
 router.get("/:uid/download/:id", async (req, res) => {
+  console.log(req.params);
   var User = await UserModel.findOne({ _id: req.params.uid });
   var File = await User.files.id(req.params.id);
+  console.log(
+    "\x1b[32m",
+    "[ DRAWER ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.address,
+    "\x1b[0m",
+    "file",
+    "\x1b[34m",
+    File._id,
+    "\x1b[0m",
+    "belonging to",
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "was downloaded"
+  );
   res.download(path.join("/mnt/drawer/" + req.params.uid + "/" + File.path));
 });
 
 router.get("/:uid/get/:id", async (req, res) => {
   var User = await UserModel.findOne({ _id: req.params.uid });
   var File = await User.files.id(req.params.id);
+  console.log(
+    "\x1b[32m",
+    "[ DRAWER ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.address,
+    "\x1b[0m",
+    "file",
+    "\x1b[34m",
+    File._id,
+    "\x1b[0m",
+    "belonging to",
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "was downloaded"
+  );
   res.sendFile(path.join("/mnt/drawer/" + req.params.uid + "/" + File.path));
 });
 
@@ -33,6 +70,23 @@ router.post("/:uid/rename/:id", async (req, res) => {
     "/mnt/drawer/" + req.params.uid + "/" + newPath,
     (err) => {
       if (err) throw err;
+      console.log(
+        "\x1b[32m",
+        "[ DRAWER ]",
+        "\x1b[31m",
+        moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        req.connection.remoteAddress,
+        "\x1b[34m",
+        User.username,
+        "\x1b[0m",
+        "renamed file",
+        "\x1b[34m",
+        File.path,
+        "to",
+        "\x1b[34m",
+        newPath
+      );
     }
   );
   File.path = newPath;
@@ -50,6 +104,20 @@ router.delete("/:uid/delete/:id", async (req, res) => {
       await File.remove();
       await User.save();
       res.json(User);
+      console.log(
+        "\x1b[32m",
+        "[ DRAWER ]",
+        "\x1b[31m",
+        moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        req.connection.remoteAddress,
+        "\x1b[34m",
+        User.username,
+        "\x1b[0m",
+        "deleted file",
+        "\x1b[34m",
+        File.path
+      );
       if (error) throw error;
     }
   );
@@ -158,7 +226,22 @@ router.post("/:uid/upload", async (req, res) => {
         fs.rename(
           files[i].path,
           `/mnt/drawer/${req.params.uid}/${files[i].name}`,
-          () => {}
+          () => {
+            console.log(
+              "\x1b[32m",
+              "[ DRAWER ]",
+              "\x1b[31m",
+              moment().format("MM/DD/YYYY, HH:MM:SS"),
+              "\x1b[33m",
+              req.connection.remoteAddress,
+              "\x1b[34m",
+              User.username,
+              "\x1b[0m",
+              "uploaded file",
+              "\x1b[34m",
+              files[i].name
+            );
+          }
         );
       });
       await User.save();

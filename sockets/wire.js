@@ -27,9 +27,11 @@ module.exports = (io) => {
               namespace.emit("send", data);
               console.log(
                 "\x1b[32m",
-                "[  CHAT  ]",
+                "[  WIRE  ]",
                 "\x1b[31m",
                 moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[33m",
+                socket.handshake.address,
                 "\x1b[34m",
                 data.username,
                 "\x1b[0m",
@@ -55,9 +57,11 @@ module.exports = (io) => {
               namespace.emit("delete", id);
               console.log(
                 "\x1b[32m",
-                "[  CHAT  ]",
+                "[  WIRE  ]",
                 "\x1b[31m",
                 moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[33m",
+                socket.handshake.address,
                 "\x1b[34m",
                 Message.username,
                 "\x1b[0m",
@@ -100,9 +104,11 @@ module.exports = (io) => {
               namespace.emit("edit", Data);
               console.log(
                 "\x1b[32m",
-                "[  CHAT  ]",
+                "[  WIRE  ]",
                 "\x1b[31m",
                 moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[33m",
+                socket.handshake.address,
                 "\x1b[34m",
                 data.username,
                 "\x1b[0m",
@@ -192,9 +198,11 @@ module.exports = (io) => {
               });
               console.log(
                 "\x1b[32m",
-                "[  CHAT  ]",
+                "[  WIRE  ]",
                 "\x1b[31m",
                 moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[33m",
+                socket.handshake.address,
                 "\x1b[34m",
                 data.username,
                 "\x1b[0m",
@@ -229,9 +237,11 @@ module.exports = (io) => {
               });
               console.log(
                 "\x1b[32m",
-                "[  CHAT  ]",
+                "[  WIRE  ]",
                 "\x1b[31m",
                 moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[33m",
+                socket.handshake.address,
                 "\x1b[34m",
                 Message.username,
                 "\x1b[0m",
@@ -280,9 +290,11 @@ module.exports = (io) => {
               });
               console.log(
                 "\x1b[32m",
-                "[  CHAT  ]",
+                "[  WIRE  ]",
                 "\x1b[31m",
                 moment().format("MM/DD/YYYY, HH:MM:SS"),
+                "\x1b[33m",
+                socket.handshake.address,
                 "\x1b[34m",
                 data.username,
                 "\x1b[0m",

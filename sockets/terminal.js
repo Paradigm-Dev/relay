@@ -24,6 +24,8 @@ module.exports = (io) => {
         "[  TERM  ]",
         "\x1b[31m",
         moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        socket.handshake.address,
         "\x1b[34m",
         // data.username,
         "\x1b[0m",
@@ -42,6 +44,8 @@ module.exports = (io) => {
         "[  TERM  ]",
         "\x1b[31m",
         moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        socket.handshake.address,
         "\x1b[34m",
         // data.username,
         "\x1b[0m",
@@ -60,6 +64,8 @@ module.exports = (io) => {
         "[  TERM  ]",
         "\x1b[31m",
         moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        socket.handshake.address,
         "\x1b[34m",
         // data.username,
         "\x1b[0m",
@@ -78,6 +84,8 @@ module.exports = (io) => {
         "[  TERM  ]",
         "\x1b[31m",
         moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        socket.handshake.address,
         "\x1b[34m",
         // data.username,
         "\x1b[0m",
@@ -94,6 +102,8 @@ module.exports = (io) => {
         "[  TERM  ]",
         "\x1b[31m",
         moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        socket.handshake.address,
         "\x1b[34m",
         // data.username,
         "\x1b[0m",
@@ -107,28 +117,6 @@ module.exports = (io) => {
       io.emit("kill", username);
     });
 
-    socket.on("mrocks", async (data) => {
-      var User = await UserModel.findOne({ username: data.username });
-      User.moonrocks += data.value;
-      User.save();
-      console.log(
-        "\x1b[32m",
-        "[  TERM  ]",
-        "\x1b[31m",
-        moment().format("MM/DD/YYYY, HH:MM:SS"),
-        "\x1b[34m",
-        // data.username,
-        "\x1b[0m",
-        "gave",
-        "\x1b[34m",
-        data.value,
-        "\x1b[0m",
-        "moonrocks to",
-        "\x1b[34m",
-        User.username
-      );
-    });
-
     socket.on("nuke", async () => {
       await io.emit("nuke");
       shell.exec("sudo shutdown -h now");
@@ -137,6 +125,8 @@ module.exports = (io) => {
         "[  TERM  ]",
         "\x1b[31m",
         moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        socket.handshake.address,
         "\x1b[34m",
         // data.username,
         "\x1b[0m",
@@ -153,6 +143,8 @@ module.exports = (io) => {
         "[  TERM  ]",
         "\x1b[31m",
         moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        socket.handshake.address,
         "\x1b[34m",
         // data.username,
         "\x1b[0m",

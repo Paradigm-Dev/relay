@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const UserModel = require("../models/User");
 const { jwt_secret } = require("../config/vapid");
 const moment = require("moment");
+const fs = require("fs");
 
 const router = Router();
 
@@ -20,17 +21,17 @@ function handleErrors(err) {
 
   // incorrect username
   if (err.message === "incorrect username") {
-    errors.username = "That username is not registered";
+    errors.username = "Username is not registered";
   }
 
   // incorrect password
   if (err.message === "incorrect password") {
-    errors.password = "That password is incorrect";
+    errors.password = "Password is incorrect";
   }
 
   // duplicate username error
   if (err.code === 11000) {
-    errors.username = "That username is already registered";
+    errors.username = "Username is already registered";
     return errors;
   }
 
@@ -76,7 +77,7 @@ router.post("/signin", async (req, res) => {
     res.status(200).json({ user, jwt: token });
   } catch (err) {
     const errors = handleErrors(err);
-    res.status(400).json({ errors });
+    res.json({ errors });
   }
 });
 
@@ -91,7 +92,6 @@ router.post("/signup", async (req, res) => {
       bio: req.body.bio,
       color: req.body.color,
       rights: req.body.rights,
-      moonrocks: req.body.moonrocks,
       code: req.body.code,
       chatrooms: [],
       people: {
@@ -111,13 +111,13 @@ router.post("/signup", async (req, res) => {
       in: true,
     });
 
-    await ApolloModel.findOneAndUpdate(
-      { code: req.body.code },
-      { $set: { used: true, username: newUser.username, uid: newUser._id } }
-    );
+    // await ApolloModel.findOneAndUpdate(
+    //   { code: req.body.code },
+    //   { $set: { used: true, username: user.username, uid: user._id } }
+    // );
 
-    fs.mkdirSync("/mnt/drawer/" + newUser._id);
-    fs.mkdirSync(__dirname + "/../files/broadcast/" + newUser._id);
+    fs.mkdirSync("/mnt/drawer/" + user._id);
+    fs.mkdirSync(__dirname + "/../files/broadcast/" + user._id);
 
     const token = createToken(user._id);
     res.cookie("jwt", token, {
@@ -125,10 +125,24 @@ router.post("/signup", async (req, res) => {
       // maxAge: maxAge * 1000,
     });
 
-    res.status(201).json(user);
+    console.log(
+      "\x1b[32m",
+      "[  AUTH  ]",
+      "\x1b[31m",
+      moment().format("MM/DD/YYYY, HH:MM:SS"),
+      "\x1b[33m",
+      req.connection.remoteAddress,
+      "\x1b[34m",
+      user.username,
+      "\x1b[0m",
+      "signed up"
+    );
+
+    res.json(user);
   } catch (err) {
+    console.error(err);
     const errors = handleErrors(err);
-    res.status(400).json({ errors });
+    res.json({ errors });
   }
 });
 
@@ -143,7 +157,7 @@ router.get("/verify", async (req, res) => {
     jwt.verify(token, jwt_secret, async (err, decodedToken) => {
       if (err) {
         res.cookie("jwt", "", { maxAge: 1 });
-        res.statusCode(403);
+        res.sendStatus(403);
       } else {
         const user = await UserModel.findById(decodedToken.id);
         if (user) {
@@ -152,6 +166,8 @@ router.get("/verify", async (req, res) => {
             "[  AUTH  ]",
             "\x1b[31m",
             moment().format("MM/DD/YYYY, HH:MM:SS"),
+            "\x1b[33m",
+            req.connection.remoteAddress,
             "\x1b[34m",
             user.username,
             "\x1b[0m",
@@ -176,8 +192,21 @@ router.post("/verify", async (req, res) => {
     jwt.verify(token, jwt_secret, async (err, decodedToken) => {
       if (err) {
         res.cookie("jwt", "", { maxAge: 1 });
-        res.statusCode(403);
+        res.sendStatus(403);
       } else {
+        console.log(
+          "\x1b[32m",
+          "[  AUTH  ]",
+          "\x1b[31m",
+          moment().format("MM/DD/YYYY, HH:MM:SS"),
+          "\x1b[33m",
+          req.connection.remoteAddress,
+          "\x1b[34m",
+          user.username,
+          "\x1b[0m",
+          "token verified"
+        );
+
         const user = await UserModel.findById(decodedToken.id);
         if (user)
           res.json({

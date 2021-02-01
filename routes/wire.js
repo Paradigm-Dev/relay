@@ -45,9 +45,24 @@ router.post("/chatroom/new", (req, res) => {
           color: User.color,
         });
         await User.save();
-        await fs.mkdirSync(
-          // TODO(change to /files/wire)
-          __dirname + `/../files/flamechat/chatroom/${data.id}`
+        await fs.mkdirSync(__dirname + `/../files/wire/chatroom/${data.id}`);
+        console.log(
+          "\x1b[32m",
+          "[  WIRE  ]",
+          "\x1b[31m",
+          moment().format("MM/DD/YYYY, HH:MM:SS"),
+          "\x1b[33m",
+          req.connection.remoteAddress,
+          "\x1b[0m",
+          "chatroom with id",
+          "\x1b[34m",
+          data.id,
+          "\x1b[0m",
+          "and name",
+          "\x1b[34m",
+          data.title,
+          "\x1b[0m",
+          "was created"
         );
         res.json(data);
       }
@@ -62,8 +77,7 @@ router.post("/chatroom/:id/file", async (req, res) => {
 
   const form = formidable({
     multiples: false,
-    // TODO(change to /files/wire)
-    uploadDir: __dirname + "/../files/flamechat/chatroom/" + Chatroom.id,
+    uploadDir: __dirname + "/../files/wire/chatroom/" + Chatroom.id,
     keepExtensions: true,
   });
 
@@ -73,13 +87,7 @@ router.post("/chatroom/:id/file", async (req, res) => {
     file = files.file;
     await fs.renameSync(
       file.path,
-      __dirname +
-        // TODO(change to /files/wire)
-
-        "/../files/flamechat/chatroom/" +
-        Chatroom.id +
-        "/" +
-        file.name
+      __dirname + "/../files/wire/chatroom/" + Chatroom.id + "/" + file.name
     );
     res.end();
   });
@@ -92,8 +100,7 @@ router.post("/dm/:id/file", async (req, res) => {
 
   const form = formidable({
     multiples: false,
-    // TODO(change to /files/wire)
-    uploadDir: __dirname + "/../files/flamechat/dm/" + DM_data._id,
+    uploadDir: __dirname + "/../files/wire/dm/" + DM_data._id,
     keepExtensions: true,
   });
 
@@ -103,8 +110,7 @@ router.post("/dm/:id/file", async (req, res) => {
     file = files.file;
     await fs.renameSync(
       file.path,
-      // TODO(change to /files/wire)
-      __dirname + "/../files/flamechat/dm/" + DM_data._id + "/" + file.name
+      __dirname + "/../files/wire/dm/" + DM_data._id + "/" + file.name
     );
     res.end();
   });
@@ -130,12 +136,25 @@ router.get("/chatroom/:id/delete", async (req, res) => {
         });
       }
       fs.rmdir(path, async (error) => {
+        console.log(
+          "\x1b[32m",
+          "[  WIRE  ]",
+          "\x1b[31m",
+          moment().format("MM/DD/YYYY, HH:MM:SS"),
+          "\x1b[33m",
+          req.connection.remoteAddress,
+          "\x1b[0m",
+          "chatroom with id",
+          "\x1b[34m",
+          req.params.id,
+          "\x1b[0m",
+          "was deleted"
+        );
         res.end();
       });
     });
   }
-  // TODO(change to /files/wire)
-  deleteFolderRecursive(__dirname + "/../files/flamechat/" + Chatroom._id);
+  deleteFolderRecursive(__dirname + "/../files/wire/" + Chatroom._id);
 });
 
 router.get("/chatroom/:id/remove/:user", async (req, res) => {
@@ -260,6 +279,20 @@ router.get("/chatroom/:id/purge", async (req, res) => {
   var Chatroom = await ChatroomModel.findOne({ id: req.params.id });
   Chatroom.messages = [];
   await Chatroom.save();
+  console.log(
+    "\x1b[32m",
+    "[  WIRE  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[0m",
+    "chatroom with id",
+    "\x1b[34m",
+    Chatroom.id,
+    "\x1b[0m",
+    "was purged"
+  );
   res.end();
 });
 

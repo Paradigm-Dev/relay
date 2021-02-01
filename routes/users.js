@@ -17,74 +17,6 @@ const MovieModel = require("../models/Movie.js");
 const MusicModel = require("../models/Music.js");
 const BugModel = require("../models/Bug.js");
 
-// Register
-router.post("/register", (req, res) => {
-  UserModel.findOne({ username: req.body.username }).then(async (user) => {
-    if (user) {
-      res.json({ msg: "User already exists" });
-    } else {
-      console.log(req.body.code);
-      var newUser = new UserModel({
-        username: req.body.username,
-        password: req.body.password,
-        bio: req.body.bio,
-        color: req.body.color,
-        rights: req.body.rights,
-        moonrocks: req.body.moonrocks,
-        created: moment().format("dddd, MMMM Do YYYY [at] h:mm a"),
-        code: req.body.code,
-      });
-
-      await ApolloModel.findOneAndUpdate(
-        { code: req.body.code },
-        { $set: { used: true, username: newUser.username, uid: newUser._id } }
-      );
-
-      fs.mkdirSync("/mnt/drawer/" + newUser._id);
-      fs.mkdirSync(__dirname + "/../files/broadcast/" + newUser._id);
-
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
-          newUser.password = hash;
-          newUser
-            .save()
-            .then((user) => {
-              res.json(user);
-              console.log(
-                "\x1b[32m",
-                "[  AUTH  ]",
-                "\x1b[31m",
-                moment().format("MM/DD/YYYY, HH:MM:SS"),
-                "\x1b[34m",
-                user.username,
-                "\x1b[0m",
-                "created their account"
-              );
-            })
-            .catch((err) => console.error(err));
-        });
-      });
-    }
-  });
-});
-
-// Sign in
-router.post("/signin", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      res.json({ msg: "The username and password do not match an account." });
-    }
-    if (!err && user) {
-      res.json(user);
-      req.login(user, next);
-    }
-  })(req, res, next);
-});
-
 router.post("/reset", async (req, res) => {
   var user = await UserModel.findOne({ username: req.body.username });
   bcrypt.genSalt(10, (error, salt) => {
@@ -94,6 +26,19 @@ router.post("/reset", async (req, res) => {
       user
         .save()
         .then((user) => {
+          console.log(
+            "\x1b[32m",
+            "[  AUTH  ]",
+            "\x1b[31m",
+            moment().format("MM/DD/YYYY, HH:MM:SS"),
+            "\x1b[33m",
+            req.connection.remoteAddress,
+            "\x1b[34m",
+            user.username,
+            "\x1b[0m",
+            "reset their password"
+          );
+
           res.json(user);
         })
         .catch((err) => console.error(err));
@@ -152,6 +97,19 @@ router.post("/update", async (req, res) => {
   });
 
   // user.people.requests.forEach(person => people_to_update.push(person._id))
+
+  console.log(
+    "\x1b[32m",
+    "[  USER  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    user.username,
+    "\x1b[0m",
+    "updated their account settings"
+  );
 
   res.json(user);
 });
@@ -214,6 +172,20 @@ router.get("/:uid/info", async (req, res) => {
   } else res.json({ error: "This user does not exist" });
 });
 
+router.get("/username/:username/info", async (req, res) => {
+  var Person = await UserModel.findOne({ username: req.params.username });
+  if (Person) {
+    var data = {
+      username: Person.username,
+      color: Person.color,
+      in: Person.in,
+      bio: Person.bio,
+      _id: Person._id,
+    };
+    res.json(data);
+  } else res.json({ error: "This user does not exist" });
+});
+
 // Chatroom functions
 router.get("/:uid/chatroom/:id/:func", async (req, res) => {
   switch (req.params.func) {
@@ -255,18 +227,6 @@ router.get("/:uid/chatroom/:id/:func", async (req, res) => {
       res.json(User);
       break;
   }
-});
-
-// Add/remove moonrocks
-router.get("/:uid/moonrocks/:diff", (req, res) => {
-  UserModel.findOneAndUpdate(
-    { _id: req.params.uid },
-    { $inc: { moonrocks: parseInt(req.params.diff) } },
-    (error, data) => {
-      console.log(data);
-      res.json(data);
-    }
-  );
 });
 
 // Post profile pic
@@ -319,45 +279,60 @@ router.get("/:uid/delete", async (req, res) => {
         });
       }
       fs.rmdir(path, async (error) => {
-        fs.unlink(
-          _path.join(__dirname + "/../files/profile-pics/" + User._id + ".png"),
-          async (error) => {
-            if (error) console.error(error);
-            var User = await UserModel.findOne({ _id: req.params.uid });
-            User.people.approved.forEach(async (person) => {
-              var Person = await UserModel.findOne({ _id: person._id });
-              var Index = await Person.people.approved.findIndex((request) => {
-                return request._id == user._id;
-              });
-              await Person.people.approved.splice(Index, 1);
-              await Person.save();
-            });
-            User.people.requests.forEach(async (person) => {
-              var Person = await UserModel.findOne({ _id: person._id });
-              var Index = await Person.people.sent.findIndex((request) => {
-                return request._id == user._id;
-              });
-              await Person.people.approved.splice(Index, 1);
-              await Person.save();
-            });
-            User.people.sent.forEach(async (person) => {
-              var Person = await UserModel.findOne({ _id: person._id });
-              var Index = await Person.people.requests.findIndex((request) => {
-                return request._id == user._id;
-              });
-              await Person.people.approved.splice(Index, 1);
-              await Person.save();
-            });
-            await ApolloModel.findOneAndDelete({ uid: req.params.uid });
-            await UserModel.findOneAndDelete({ _id: req.params.uid });
-            res.end();
-          }
-        );
+        if (error) console.error(error);
       });
     });
   }
   deleteFolderRecursive("/mnt/drawer/" + User._id);
   deleteFolderRecursive(__dirname + "/../files/broadcast/" + User._id);
+
+  fs.unlink(
+    _path.join(__dirname + "/../files/profile-pics/" + User._id + ".png"),
+    async (error) => {
+      if (error) console.error(error);
+      var User = await UserModel.findOne({ _id: req.params.uid });
+      User.people.approved.forEach(async (person) => {
+        var Person = await UserModel.findOne({ _id: person._id });
+        var Index = await Person.people.approved.findIndex((request) => {
+          return request._id == user._id;
+        });
+        await Person.people.approved.splice(Index, 1);
+        await Person.save();
+      });
+      User.people.requests.forEach(async (person) => {
+        var Person = await UserModel.findOne({ _id: person._id });
+        var Index = await Person.people.sent.findIndex((request) => {
+          return request._id == user._id;
+        });
+        await Person.people.approved.splice(Index, 1);
+        await Person.save();
+      });
+      User.people.sent.forEach(async (person) => {
+        var Person = await UserModel.findOne({ _id: person._id });
+        var Index = await Person.people.requests.findIndex((request) => {
+          return request._id == user._id;
+        });
+        await Person.people.approved.splice(Index, 1);
+        await Person.save();
+      });
+      await ApolloModel.findOneAndDelete({ uid: req.params.uid });
+      await UserModel.findOneAndDelete({ _id: req.params.uid });
+      res.end();
+    }
+  );
+
+  console.log(
+    "\x1b[32m",
+    "[  AUTH  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "account deleted"
+  );
 });
 
 // Media
@@ -662,6 +637,21 @@ router.get("/:uid/people/send/:user", async (req, res) => {
     dm: "",
   });
   await Person.save();
+  console.log(
+    "\x1b[32m",
+    "[  USER  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "sent a friend request to",
+    "\x1b[34m",
+    Person.username
+  );
+
   res.json(User.people);
 });
 
@@ -695,7 +685,7 @@ router.get("/:uid/people/request/:user/approve", async (req, res) => {
     ],
   });
 
-  await fs.mkdirSync(__dirname + `/../files/flamechat/dm/${new_dm._id}`);
+  await fs.mkdirSync(__dirname + `/../files/wire/dm/${new_dm._id}`);
 
   await User.people.approved.push({
     _id: req.params.user,
@@ -712,6 +702,21 @@ router.get("/:uid/people/request/:user/approve", async (req, res) => {
 
   await User.save();
   await Person.save();
+
+  console.log(
+    "\x1b[32m",
+    "[  USER  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "accepted the friend request from",
+    "\x1b[34m",
+    Person.username
+  );
 
   res.json(User.people);
 });
@@ -733,6 +738,21 @@ router.get("/:uid/people/request/:user/decline", async (req, res) => {
   await User.save();
   await Person.save();
 
+  console.log(
+    "\x1b[32m",
+    "[  USER  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "declined the friend request from",
+    "\x1b[34m",
+    Person.username
+  );
+
   res.json(User.people);
 });
 
@@ -752,6 +772,21 @@ router.get("/:uid/people/request/:user/retract", async (req, res) => {
 
   await User.save();
   await Person.save();
+
+  console.log(
+    "\x1b[32m",
+    "[  USER  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "retracted their friend request to",
+    "\x1b[34m",
+    Person.username
+  );
 
   res.json(User.people);
 });
@@ -793,7 +828,7 @@ router.get("/:uid/people/remove/:user", async (req, res) => {
     });
   }
   await deleteFolderRecursive(
-    __dirname + `/../files/flamechat/dm/${User.people.approved[User_I].dm}`
+    __dirname + `/../files/wire/dm/${User.people.approved[User_I].dm}`
   );
 
   await User.people.approved[User_I].remove();
@@ -801,6 +836,21 @@ router.get("/:uid/people/remove/:user", async (req, res) => {
 
   await User.save();
   await Person.save();
+
+  console.log(
+    "\x1b[32m",
+    "[  USER  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "unfriended",
+    "\x1b[34m",
+    Person.username
+  );
 
   res.json({
     user: User,
@@ -823,6 +873,21 @@ router.get("/:uid/people/block/:user", async (req, res) => {
   await User.save();
   await Person.save();
 
+  console.log(
+    "\x1b[32m",
+    "[  USER  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "blocked",
+    "\x1b[34m",
+    Person.username
+  );
+
   res.json(User);
 });
 
@@ -843,15 +908,22 @@ router.get("/:uid/people/unblock/:user", async (req, res) => {
   await User.save();
   await Person.save();
 
-  res.json(User.people);
-});
-
-router.post("/:uid/chatroomOrder", async (req, res) => {
-  await UserModel.findOneAndUpdate(
-    { _id: req.params.uid },
-    { $set: { chatrooms: req.body } }
+  console.log(
+    "\x1b[32m",
+    "[  USER  ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "unblocked",
+    "\x1b[34m",
+    Person.username
   );
-  res.json(await UserModel.findOne({ _id: req.params.uid }));
+
+  res.json(User.people);
 });
 
 module.exports = router;

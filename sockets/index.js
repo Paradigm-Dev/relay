@@ -11,10 +11,8 @@ module.exports = {
         "[ SOCKET ]",
         "\x1b[31m",
         moment().format("MM/DD/YYYY, HH:MM:SS"),
-        "\x1b[34m",
-        socket.handshake.address == "192.168.1.1"
-          ? "local network"
-          : socket.handshake.address,
+        "\x1b[33m",
+        socket.handshake.address,
         "\x1b[0m",
         "connected"
       );
@@ -44,10 +42,12 @@ module.exports = {
             "[  AUTH  ]",
             "\x1b[31m",
             moment().format("MM/DD/YYYY, HH:MM:SS"),
+            "\x1b[33m",
+            socket.handshake.address,
             "\x1b[34m",
             user,
             "\x1b[0m",
-            "logged in"
+            "signed in"
           );
           setInterval(async () => {
             var newUser = await UserModel.findOne({ username: user });
@@ -67,10 +67,12 @@ module.exports = {
             "[  AUTH  ]",
             "\x1b[31m",
             moment().format("MM/DD/YYYY, HH:MM:SS"),
+            "\x1b[33m",
+            socket.handshake.address,
             "\x1b[34m",
             user.username,
             "\x1b[0m",
-            "logged in"
+            "signed in"
           );
           setInterval(async () => {
             var newUser = await UserModel.findOne({ username: user.username });
@@ -93,10 +95,12 @@ module.exports = {
           "[  AUTH  ]",
           "\x1b[31m",
           moment().format("MM/DD/YYYY, HH:MM:SS"),
+          "\x1b[33m",
+          socket.handshake.address,
           "\x1b[34m",
           data.username,
           "\x1b[0m",
-          "logged out"
+          "signed out"
         );
         socket.emit("logout");
       });
@@ -139,17 +143,15 @@ module.exports = {
           "[ SOCKET ]",
           "\x1b[31m",
           moment().format("MM/DD/YYYY, HH:MM:SS"),
-          "\x1b[34m",
-          socket.handshake.address == "192.168.1.1"
-            ? "local network"
-            : socket.handshake.address,
+          "\x1b[33m",
+          socket.handshake.address,
           "\x1b[0m",
           "disconnected"
         );
       });
 
       socket.on("new_chatroom", () => {
-        require("./flamechat.js")(io);
+        require("./wire.js")(io);
       });
 
       socket.on("kick", (user) => io.emit("kick", user));

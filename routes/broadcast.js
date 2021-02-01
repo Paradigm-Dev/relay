@@ -35,6 +35,20 @@ router.post("/:uid/create", async (req, res) => {
     title: "Paradigm Broadcast",
     body: `New Broadcast from ${User.username}`,
   });
+
+  console.log(
+    "\x1b[32m",
+    "[ BRDCST ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "made a new broadcast post"
+  );
+
   recipients.forEach((recipient) => {
     recipient.notifications.forEach((subscription) => {
       webpush
@@ -60,6 +74,19 @@ router.put("/:uid/:post", async (req, res) => {
     }
   );
 
+  console.log(
+    "\x1b[32m",
+    "[ BRDCST ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "updated a broadcast post"
+  );
+
   res.end();
 });
 
@@ -70,6 +97,20 @@ router.get("/:uid/delete/:id", async (req, res) => {
   });
   User.posts[Index].remove();
   await User.save();
+
+  console.log(
+    "\x1b[32m",
+    "[ BRDCST ]",
+    "\x1b[31m",
+    moment().format("MM/DD/YYYY, HH:MM:SS"),
+    "\x1b[33m",
+    req.connection.remoteAddress,
+    "\x1b[34m",
+    User.username,
+    "\x1b[0m",
+    "deleted a broadcast post"
+  );
+
   res.end();
 });
 
