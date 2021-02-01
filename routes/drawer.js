@@ -1,17 +1,16 @@
 const express = require("express");
-const router = express.Router();
 const fs = require("fs");
 const path = require("path");
 const formidable = require("formidable");
 const moment = require("moment");
 const prettyBytes = require("pretty-bytes");
-
 const UserModel = require("../models/User.js");
 
-router.get("/:uid/download/:id", async (req, res) => {
+const router = express.Router();
+
+router.get("/:uid/download/:path", async (req, res) => {
   console.log(req.params);
-  var User = await UserModel.findOne({ _id: req.params.uid });
-  var File = await User.files.id(req.params.id);
+  const User = await UserModel.findOne({ _id: req.params.uid });
   console.log(
     "\x1b[32m",
     "[ DRAWER ]",
@@ -22,7 +21,7 @@ router.get("/:uid/download/:id", async (req, res) => {
     "\x1b[0m",
     "file",
     "\x1b[34m",
-    File._id,
+    req.params.path,
     "\x1b[0m",
     "belonging to",
     "\x1b[34m",
@@ -30,23 +29,24 @@ router.get("/:uid/download/:id", async (req, res) => {
     "\x1b[0m",
     "was downloaded"
   );
-  res.download(path.join("/mnt/drawer/" + req.params.uid + "/" + File.path));
+  res.download(
+    path.join("/mnt/drawer/" + req.params.uid + "/" + req.params.path)
+  );
 });
 
-router.get("/:uid/get/:id", async (req, res) => {
-  var User = await UserModel.findOne({ _id: req.params.uid });
-  var File = await User.files.id(req.params.id);
+router.get("/:uid/get/:path", async (req, res) => {
+  const User = await UserModel.findOne({ _id: req.params.uid });
   console.log(
     "\x1b[32m",
     "[ DRAWER ]",
     "\x1b[31m",
     moment().format("MM/DD/YYYY, HH:MM:SS"),
     "\x1b[33m",
-    req.connection.address,
+    req.connection.remoteAddress,
     "\x1b[0m",
     "file",
     "\x1b[34m",
-    File._id,
+    req.params.path,
     "\x1b[0m",
     "belonging to",
     "\x1b[34m",
@@ -54,7 +54,9 @@ router.get("/:uid/get/:id", async (req, res) => {
     "\x1b[0m",
     "was downloaded"
   );
-  res.sendFile(path.join("/mnt/drawer/" + req.params.uid + "/" + File.path));
+  res.sendFile(
+    path.join("/mnt/drawer/" + req.params.uid + "/" + req.params.path)
+  );
 });
 
 router.post("/:uid/rename/:id", async (req, res) => {

@@ -111,7 +111,7 @@ app.use(compression({ filter: shouldCompress }));
 // CAMPAIGN
 // app.use('/campaign', express.static(__dirname + '/campaign'))
 
-app.get("*", getUserData);
+// app.get("*", getUserData);
 
 // RELAY
 app.use("/relay", express.static(__dirname + "/files"));

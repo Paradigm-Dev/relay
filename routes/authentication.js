@@ -16,7 +16,6 @@ function createToken(id) {
 }
 
 function handleErrors(err) {
-  console.log(err.message, err.code);
   let errors = { username: "", password: "" };
 
   // incorrect username
