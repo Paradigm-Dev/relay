@@ -190,9 +190,9 @@ router.post("/verify", async (req, res) => {
   if (token) {
     jwt.verify(token, jwt_secret, async (err, decodedToken) => {
       if (err) {
-        res.cookie("jwt", "", { maxAge: 1 });
-        res.sendStatus(403);
+        res.json({ valid: false });
       } else {
+        const user = await UserModel.findById(decodedToken.id);
         console.log(
           "\x1b[32m",
           "[  AUTH  ]",
@@ -206,7 +206,6 @@ router.post("/verify", async (req, res) => {
           "token verified"
         );
 
-        const user = await UserModel.findById(decodedToken.id);
         if (user)
           res.json({
             valid: true,

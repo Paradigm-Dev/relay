@@ -31,6 +31,10 @@ const FileSchema = new mongoose.Schema({
   size: String,
   date: String,
   path: String,
+  files: {
+    required: false,
+    type: Array,
+  },
 });
 
 const FriendSchema = new mongoose.Schema({
@@ -91,6 +95,7 @@ const UserSchema = new mongoose.Schema({
   preflight: mongoose.Schema.Types.Mixed,
   notifications: Array,
   code: String,
+  asteroid: Object,
 });
 
 const UserModel = mongoose.model("user", UserSchema);

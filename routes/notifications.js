@@ -27,7 +27,7 @@ router.post("/:uid/subscribe", async (req, res) => {
   });
 
   webpush
-    .sendNotification(subscription, payload)
+    .sendNotification(subscription.data, payload)
     .catch((err) => console.error(err));
 
   await UserModel.findOneAndUpdate(

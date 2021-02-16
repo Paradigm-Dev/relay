@@ -119,7 +119,7 @@ module.exports = (io) => {
 
     socket.on("nuke", async () => {
       await io.emit("nuke");
-      shell.exec("sudo shutdown -h now");
+      shell.exec("sudo shutdown now");
       console.log(
         "\x1b[32m",
         "[  TERM  ]",
@@ -131,6 +131,23 @@ module.exports = (io) => {
         // data.username,
         "\x1b[0m",
         "nuked the server"
+      );
+    });
+
+    socket.on("reboot", async () => {
+      await io.emit("nuke");
+      shell.exec("sudo reboot");
+      console.log(
+        "\x1b[32m",
+        "[  TERM  ]",
+        "\x1b[31m",
+        moment().format("MM/DD/YYYY, HH:MM:SS"),
+        "\x1b[33m",
+        socket.handshake.address,
+        "\x1b[34m",
+        // data.username,
+        "\x1b[0m",
+        "rebooted the server"
       );
     });
 

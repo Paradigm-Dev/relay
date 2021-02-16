@@ -53,6 +53,23 @@ console.log(
 server.timeout = 1000000000;
 
 const io = socket(server, {
+  allowEIO3: true,
+  cors: {
+    origin: [
+      "https://www.theparadigmdev.com",
+      "https://theparadigmdev.com",
+      "https://localhost:8080",
+      "http://localhost:8080",
+      "https://localhost:8100",
+      "http://localhost:8100",
+      "https://192.168.1.178:8080",
+      "http://192.168.1.178:8080",
+      "https://192.168.1.178:8100",
+      "http://192.168.1.178:8100",
+      "app://.",
+    ],
+    methods: ["GET", "POST"],
+  },
   // transports: ["websocket"],
 });
 
@@ -132,6 +149,7 @@ app.use("/api/notifications", require("./routes/notifications.js"));
 app.use("/api/authentication", require("./routes/authentication.js"));
 app.use("/api/forum", require("./routes/forum.js"));
 app.use("/api/people", require("./routes/people.js"));
+app.use("/api/asteroid", require("./routes/asteroid.js"));
 app.use("/api", require("./routes/index.js"));
 
 // PARADIGM
