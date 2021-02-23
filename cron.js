@@ -1,5 +1,6 @@
 const cron = require("cron");
 const shell = require("shelljs");
+const host = require("./app").host;
 
 module.exports.initCron = () => {
   let job = new cron.CronJob(

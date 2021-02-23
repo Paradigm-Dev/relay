@@ -77,6 +77,7 @@ require("./sockets/index.js").socket(io);
 require("./sockets/wire.js")(io);
 require("./sockets/terminal.js")(io);
 require("./sockets/transmission.js")(io);
+require("./sockets/drawer.js")(io);
 
 mongoose.promise = global.Promise;
 mongoose.set("returnOriginal", false);
@@ -191,3 +192,7 @@ async function fixUsers() {
 fixUsers();
 
 require("./cron.js").initCron();
+
+module.exports = {
+  host,
+};
