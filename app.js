@@ -126,6 +126,8 @@ function shouldCompress(req, res) {
 }
 app.use(compression({ filter: shouldCompress }));
 
+// PARADIGM
+app.use("/", express.static(__dirname + "/dist"));
 // CAMPAIGN
 // app.use('/campaign', express.static(__dirname + '/campaign'))
 
@@ -152,9 +154,6 @@ app.use("/api/forum", require("./routes/forum.js"));
 app.use("/api/people", require("./routes/people.js"));
 app.use("/api/asteroid", require("./routes/asteroid.js"));
 app.use("/api", require("./routes/index.js"));
-
-// PARADIGM
-app.use("/", express.static(__dirname + "/dist"));
 
 mongoose
   .connect(`mongodb://${host}:27017/paradigm`, {
