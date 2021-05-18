@@ -45,10 +45,11 @@ function handleErrors(err) {
 }
 
 async function signIn(username, password) {
-	const user = await UserModel.findOneAndUpdate({ username }, { in: true }, { new: true });
+	let user = await UserModel.findOne({ username });
 	if (user) {
 		const auth = await bcrypt.compare(password, user.password);
 		if (auth) {
+			user = await UserModel.findOneAndUpdate({ username }, { in: true }, { new: true });
 			return user;
 		}
 		throw Error('incorrect password');
