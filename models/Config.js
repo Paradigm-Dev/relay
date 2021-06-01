@@ -15,6 +15,7 @@ const ConfigSchema = new mongoose.Schema(
       sign_in: Boolean,
       sign_up: Boolean,
       recover: Boolean,
+      landing: Boolean,
     },
     shutdown: Boolean,
     apps: Object,

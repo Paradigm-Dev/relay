@@ -28,7 +28,6 @@
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
-    "file-type": "^9.0.0",
     "formidable": "^1.2.2",
     "hound": "^1.0.5",
     "http-proxy": "^1.18.1",
@@ -42,7 +41,7 @@
     "passport-local": "^1.0.0",
     "pretty-bytes": "^5.4.1",
     "shelljs": "^0.8.4",
-    "socket.io": "^3.1.1",
+    "socket.io": "^4.1.2",
     "validator": "^13.5.2",
     "weather": "^1.0.4",
     "web-push": "^3.4.4"
